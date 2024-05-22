@@ -190,7 +190,7 @@ module.exports = () => {
     router.post('/superuser/save/systemOption', (req, res) => {
         let obj = {
             user_id: req.body.user_id,
-            role_id: req.body.role_id,
+            roleName: req.body.roleName,
             userManage: req.body.userManage,
             roleMannage: req.body.roleMannage,
             languageManage: req.body.languageManage,
@@ -210,7 +210,7 @@ module.exports = () => {
     router.post('/superuser/update/systemOption', (req, res) => {
         let obj = {
             user_id: req.body.user_id,
-            role_id: req.body.role_id,
+            roleName: req.body.roleName,
             userManage: req.body.userManage,
             roleMannage: req.body.roleMannage,
             languageManage: req.body.languageManage,

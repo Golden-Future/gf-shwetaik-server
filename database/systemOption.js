@@ -30,7 +30,7 @@ let update = (obj) => {
             } else {
                 data.user_id = obj.user_id == '' || obj.user_id == null || obj.user_id == undefined ? data.user_id : obj.user_id;
 
-                data.role_id = obj.role_id == '' || obj.role_id == null || obj.role_id == undefined ? data.role_id : obj.role_id;
+                data.roleName = obj.roleName == '' || obj.roleName == null || obj.roleName == undefined ? data.roleName : obj.roleName;
 
                 data.roleMannage = obj.roleMannage == '' || obj.roleMannage == null || obj.roleMannage == undefined ? data.roleMannage : obj.roleMannage;
 

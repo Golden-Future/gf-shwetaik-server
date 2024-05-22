@@ -16,8 +16,8 @@ let UserScheme = new Schema({
 });
 
 let SystemOptionsScheme = new Schema({
-    user_id: { type: Number, required: true },
-    role_id: { type: String},
+    user_id: { type: Number},
+    roleName: { type: String},
     userManage: { type: Boolean },
     roleMannage: { type: Boolean },
     languageManage: { type: Boolean },
