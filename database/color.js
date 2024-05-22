@@ -1,10 +1,10 @@
 let db = require('./db');
-let Tabs = db.Tabs;
+let Color = db.Color;
 
 
 let all = () => {
     return new Promise((resolve, reject) => {
-        Tabs.find({}, (err, data) => {
+        Color.find({}, (err, data) => {
             if (err) reject(err);
             resolve(data);
         })
@@ -14,8 +14,8 @@ let all = () => {
 let save = (obj) => {
     return new Promise((resolve, reject) => {
         obj['since'] = new Date();
-        let tabs = new Tabs(obj);
-        tabs.save((err, data) => {
+        let color = new Color(obj);
+        color.save((err, data) => {
             if (err) reject(err);
             resolve(data);
         })
@@ -24,18 +24,19 @@ let save = (obj) => {
 
 let update = (obj) => {
     return new Promise((resolve, reject) => {
-        Tabs.findOne({ tabs_id: obj.tabs_id }, (err, data) => {
+        Color.findOne({ color_id: obj.color_id }, (err, data) => {
             if (err) {
                 reject(err)
             } else {
-                let object = {
-                    tabName: obj.tabName == null || obj.tabName == undefined ? data.tabName : obj.tabName,
-                    user_id: obj.user_id == null || obj.user_id == undefined ? data.user_id : obj.user_id,
-                    tabIcon: obj.tabIcon == null || obj.tabIcon == undefined ? data.tabIcon : obj.tabIcon,
-                    tabIconColor: obj.tabIconColor == null || obj.tabIconColor == undefined ? data.tabIconColor : obj.tabIconColor,
-                    since: new Date()
-                };
-                object.save((error, datas) => {
+                data.primary = obj.primary == '' || obj.primary == null || obj.primary == undefined ? data.primary : obj.primary;
+
+                data.secondary = obj.secondary == '' || obj.secondary == null || obj.secondary == undefined ? data.secondary : obj.secondary;
+
+                data.third = obj.third == '' || obj.third == null || obj.third == undefined ? data.third : obj.third;
+
+                data.since = new Date()
+                
+                data.save((error, datas) => {
                     if (error) reject(error);
                     resolve(datas);
                 })
@@ -46,7 +47,7 @@ let update = (obj) => {
 
 let find = (id) => {
     return new Promise((resolve, reject) => {
-        Tabs.findOne({ tabs_id: id }, (err, data) => {
+        Color.findOne({ color_id: id }, (err, data) => {
             if (err) reject(err);
             resolve(data);
         })
@@ -55,7 +56,7 @@ let find = (id) => {
 
 let destory = (id) => {
     return new Promise((resolve, reject) => {
-        Tabs.deleteOne({ tabs_id: id }, (err, data) => {
+        Color.deleteOne({ color_id: id }, (err, data) => {
             if (err) reject(err);
             resolve(data);
         })

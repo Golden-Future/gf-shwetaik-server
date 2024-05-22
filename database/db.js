@@ -17,11 +17,16 @@ let UserScheme = new Schema({
 
 let SystemOptionsScheme = new Schema({
     user_id: { type: Number, required: true },
-    roleAccess: { type: Boolean },
-    languageAccess: { type: Boolean },
-    systemAccess: { type: Boolean },
-    dataAccess: { type: Boolean },
-    systemBoardAccess: {type: Boolean},
+    role_id: { type: String},
+    userManage: { type: Boolean },
+    roleMannage: { type: Boolean },
+    languageManage: { type: Boolean },
+    tableManage: { type: Boolean },
+    colorManage: { type: Boolean },
+    filterManage: {type: Boolean},
+    tableSync: { type: Boolean },
+    tableFetch: { type: Boolean },
+    tableInsert: {type: Boolean},
     since: { type: Date, required: true },
 });
 
@@ -31,35 +36,31 @@ let LanguageScheme = new Schema({
     since: { type: Date, required: true }
 });
 
-let LanguageTextScheme = new Schema({
-    text: { type: String },
-    langugae_id: { type: Number },
-    since: { type: Date, required: true }
-});
-
 let RoleScheme = new Schema({
     roleName: { type: String },
     since: { type: Date, required: true }
 });
 
-let TabsScheme = new Schema({
-    tabName: { type: String },
-    user_id: { type: Number },
-    tabIcon: { type: String },
-    tabIconColor: { type: String },
-    since: { type: Date, required: true }
-});
+let ColorScheme = new Schema({
+    primary: { type: String },
+    secondary: { type: String },
+    third: { type: String },
+    since: { type: Date ,required: true}
+})
 
+let FilterScheme = new Schema({
+    key: { type: String },
+    value: { type: String },
+    table_id: { type: Number },
+    role_id: { type: Number },
+    user_id: { type: Number },
+    since: { type: Date }
+})
 let TableScheme = new Schema({
     tableName: { type: String },
     since: { type: Date }
 });
 
-let DataScheme = new Schema({
-    table_id: {type: Number},
-    option: { type: Map, of: String },
-    since: { type: Date }
-});
 
 RoleScheme.plugin(autoI, { field: "role_id" });
 RoleScheme.plugin(paginate);
@@ -73,13 +74,6 @@ LanguageScheme.plugin(autoI, { field: "language_id" });
 LanguageScheme.plugin(paginate);
 let Language = mongoose.model("Languages", LanguageScheme);
 
-LanguageTextScheme.plugin(autoI, { field: "languageText_id" });
-LanguageTextScheme.plugin(paginate);
-let LanguageText = mongoose.model("LanguageText", LanguageTextScheme);
-
-TabsScheme.plugin(autoI, { field: "tabs_id" });
-TabsScheme.plugin(paginate);
-let Tabs = mongoose.model("Tabs", TabsScheme);
 
 SystemOptionsScheme.plugin(autoI, { field: "systemOption_id" });
 SystemOptionsScheme.plugin(paginate);
@@ -89,18 +83,20 @@ TableScheme.plugin(autoI, { field: "table_id" });
 TableScheme.plugin(paginate);
 let Tables = mongoose.model("Tables", TableScheme);
 
-DataScheme.plugin(autoI, { field: "data_id" });
-DataScheme.plugin(paginate);
-let Data = mongoose.model("Datas", DataScheme);
+FilterScheme.plugin(autoI, { field: 'filter_id' });
+FilterScheme.plugin(paginate);
+let Filter = mongoose.model('Filters', FilterScheme);
 
+ColorScheme.plugin(autoI, { field: 'color_id' });
+ColorScheme.plugin(paginate);
+let Color = mongoose.model('Colors', ColorScheme);
 
 module.exports = {
     User,
     Role,
     Language,
-    LanguageText,
-    Tabs,
     SystemOption,
     Tables,
-    Data,
+    Filter,
+    Color
 }

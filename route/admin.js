@@ -20,13 +20,12 @@ module.exports = () => {
     // Database file import
 
     let User = require("../database/user");
-    let Tab = require('../database/tabs');
     let Role = require('../database/role');
     let Language = require('../database/language');
-    let LanguageText = require('../database/languageText');
     let SystemOption = require('../database/systemOption');
     let Table = require('../database/table');
-    let Data = require('../database/data');
+    let Color = require('../database/color');
+    let Filter = require('../database/filter');
 
     // ****** USER ******* //
 
@@ -142,49 +141,6 @@ module.exports = () => {
 
     // ****** ROLE ******* //
 
-    // ****** Tab ******* //
-
-    router.get('/superuser/all/tab', (req, res) => {
-        Tab.all()
-            .then((result) => res.json({ con: true, data: result, msg: `Successfull` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    });
-
-    router.post('/superuser/save/tab', (req, res) => {
-        let obj = {
-            tabName: req.body.tabName,
-            user_id: req.body.user_id,
-            tabIcon: req.body.tabIcon,
-            tabIconColor: req.body.tabIconColor,
-        };
-        Tab.save(obj)
-            .then((result) => res.json({ con: true, data: result, msg: `Save Successfull` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    });
-
-    router.post('/superuser/update/tab', (req, res) => {
-        let obj = {
-            tabName: req.body.tabName,
-            user_id: req.body.user_id,
-            tabIcon: req.body.tabIcon,
-            tabIconColor: req.body.tabIconColor,
-            tabs_id: req.body.tabs_id
-        };
-
-        Tab.update(obj)
-            .then((result) => res.json({ con: true, data: result, msg: `Update Successfull` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    });
-
-    router.post('/superuser/delete/tab', (req, res) => {
-        let id = req.body.tabs_id;
-        Tab.destory(id)
-            .then((result) => res.json({ con: true, data: result, msg: `Delete Successfull` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    });
-
-    // ****** Tab ******* //
-
     // ****** Language ******* //
 
     router.get('/superuser/all/language', (req, res) => {
@@ -223,44 +179,6 @@ module.exports = () => {
 
     // ****** Language ******* //
 
-    // ****** Language Text ******* //
-
-    router.get('/superuser/all/languageText', (req, res) => {
-        LanguageText.all()
-        .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-        .catch((error) => res.json({ con: false, data: error, msg: `Error` }));        
-    })
-
-    router.post('/superuser/save/languageText', (req, res) => {
-        let obj = {
-            text: req.body.text,
-            language_id: req.body.language_id
-        };
-        LanguageText.save(obj)
-            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    });
-
-    router.post('/superuser/update/languageText', (req, res) => {
-        let obj = {
-            text: req.body.text,
-            language_id: req.body.language_id,
-            languageText_id: req.body.languageText_id
-        };
-        LanguageText.update(obj)
-            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    });
-
-    router.post('/superuser/delete/languageText', (req, res) => {
-        let id = req.body.languageText_id;
-        LanguageText.destory(id)
-            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-    })
-
-    // ****** Language Text ******* //
-
     // ****** SystemOption ******* //
 
     router.get('/superuser/all/systemOption', (req, res) => {
@@ -272,10 +190,16 @@ module.exports = () => {
     router.post('/superuser/save/systemOption', (req, res) => {
         let obj = {
             user_id: req.body.user_id,
-            roleAccess: req.body.roleAccess,
-            languageAccess: req.body.languageAccess,
-            systemAccess: req.body.systemAccess,
-            dataAccess: req.body.dataAccess,
+            role_id: req.body.role_id,
+            userManage: req.body.userManage,
+            roleMannage: req.body.roleMannage,
+            languageManage: req.body.languageManage,
+            tableManage: req.body.tableManage,
+            colorManage: req.body.colorManage,
+            filterManage: req.body.filterManage,
+            tableSync: req.body.tableSync,
+            tableFetch: req.body.tableFetch,
+            tableInsert: req.body.tableInsert,
         };
 
         SystemOption.save(obj)
@@ -286,11 +210,16 @@ module.exports = () => {
     router.post('/superuser/update/systemOption', (req, res) => {
         let obj = {
             user_id: req.body.user_id,
-            roleAccess: req.body.roleAccess,
-            languageAccess: req.body.languageAccess,
-            systemAccess: req.body.systemAccess,
-            dataAccess: req.body.dataAccess,
-            systemOption_id: req.body.systemOption_id
+            role_id: req.body.role_id,
+            userManage: req.body.userManage,
+            roleMannage: req.body.roleMannage,
+            languageManage: req.body.languageManage,
+            tableManage: req.body.tableManage,
+            colorManage: req.body.colorManage,
+            filterManage: req.body.filterManage,
+            tableSync: req.body.tableSync,
+            tableFetch: req.body.tableFetch,
+            tableInsert: req.body.tableInsert,
         };
 
         SystemOption.update(obj)
@@ -343,44 +272,91 @@ module.exports = () => {
 
     // ****** Table ******* //
 
-    // ****** Data ******* //
+    // ****** Filter ******* //
 
-    router.get('/superuser/all/data', (req, res) => {
-        Data.all()
+    router.get('/superuser/all/filter', (req, res) => {
+        Filter.all()
             .then((result) => res.json({ con: true, data: result, msg: `Success` }))
             .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
     });
 
-    router.post('/superuser/save/data', (req, res) => {
-        let obj = {
-            option: req.body.option,
-            table_id: req.body.table_id
+    router.post('/superuser/save/filter', (req, res) => {
+        let filter = {
+            key: req.body.key,
+            value: req.body.value,
+            table_id: req.body.table_id,
+            role_id: req.body.role_id,
+            user_id: req.body.user_id,
         };
-        console.log(obj)
-        Data.save(obj)
+        Filter.save(filter)
             .then((result) => res.json({ con: true, data: result, msg: `Success` }))
             .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
     });
 
-    router.post('/superuser/update/data', (req, res) => {
-        let obj = {
-            option: req.body.option,
-            data_id: req.body.data_id,
-            table_id: req.body.table_id
+    router.post("/superuser/update/filter", (req, res) => {
+        let filter = {
+            key: req.body.key,
+            value: req.body.value,
+            table_id: req.body.table_id,
+            role_id: req.body.role_id,
+            user_id: req.body.user_id,
+            filter_id: req.body.filter_id
         };
-        Data.update(obj)
+        Filter.update(filter)
             .then((result) => res.json({ con: true, data: result, msg: `Success` }))
             .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
     });
 
-    router.post('/superuser/delete/data', (req, res) => {
-        let id = req.body.data_id;
-        Data.destory(id)
+    router.post('/superuser/delete/filter', (req, res) => {
+        let id = req.body.filter_id;
+        Filter.destory(id)
             .then((result) => res.json({ con: true, data: result, msg: `Success` }))
             .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
     });
 
-    // ****** Data ******* //
+    // ****** Filter ******* //
+
+    // ****** Color ******* //
+
+
+    router.get('/superuser/all/color', (req, res) => {
+        Color.all()
+            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    });
+
+    router.post('/superuser/save/color', (req, res) => {
+        let color = {
+            primary: req.body.primary,
+            secondary: req.body.secondary,
+            third: req.body.third,
+        };
+        Color.save(color)
+            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    });
+
+    router.post("/superuser/update/color", (req, res) => {
+        let color = {
+            primary: req.body.primary,
+            secondary: req.body.secondary,
+            third: req.body.third,
+            color_id: req.body.color_id
+        };
+        Color.update(color)
+            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    });
+
+    router.post('/superuser/delete/delete', (req, res) => {
+        let id = req.body.color_id;
+        Color.destory(id)
+            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    });
+
+    // ****** Color ******* //
+
 
     router.post("/all", (req, res) => {
         let data = req.body.data;
