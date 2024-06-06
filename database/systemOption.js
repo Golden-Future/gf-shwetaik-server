@@ -28,30 +28,45 @@ let update = (obj) => {
             if (err) {
                 reject(err)
             } else {
-                data.user_id = obj.user_id == '' || obj.user_id == null || obj.user_id == undefined ? data.user_id : obj.user_id;
 
+                // {
+                //     "roleName": "CEO",
+                //     "userManage": false,
+                //     "roleManage": false,
+                //     "languageManage": false,
+                //     "tableManage": false,
+                //     "colorManage": false,
+                //     "filterManage": false,
+                //     "tableSync": false,
+                //     "tableFetch": false,
+                //     "tableInsert": false,
+                //     "systemOption_id": 2
+                // }
                 data.roleName = obj.roleName == '' || obj.roleName == null || obj.roleName == undefined ? data.roleName : obj.roleName;
 
-                data.roleMannage = obj.roleMannage == '' || obj.roleMannage == null || obj.roleMannage == undefined ? data.roleMannage : obj.roleMannage;
+                data.userManage = obj.userManage == null || obj.userManage == undefined ? data.userManage : obj.userManage;
 
-                data.roleMannage = obj.roleMannage == '' || obj.roleMannage == null || obj.roleMannage == undefined ? data.roleMannage : obj.roleMannage;
+                data.roleManage = obj.roleManage == null || obj.roleManage == undefined ? data.roleManage : obj.roleManage;
 
-                data.languageManage = obj.languageManage == '' || obj.languageManage == null || obj.languageManage == undefined ? data.languageManage : obj.languageManage;
+                data.languageManage = obj.languageManage == null || obj.languageManage == undefined ? data.languageManage : obj.languageManage;
 
-                data.tableManage = obj.tableManage == '' || obj.tableManage == null || obj.tableManage == undefined ? data.tableManage : obj.tableManage;
+                data.lang = obj.lang == null || obj.lang == undefined ? data.lang : obj.lang;
+                data.user_id = obj.user_id == null || obj.user_id == undefined ? data.user_id : obj.user_id;
 
-                data.colorManage = obj.colorManage == '' || obj.colorManage == null || obj.colorManage == undefined ? data.colorManage : obj.colorManage;
+                data.tableManage = obj.tableManage == null || obj.tableManage == undefined ? data.tableManage : obj.tableManage;
 
-                data.filterManage = obj.filterManage == '' || obj.filterManage == null || obj.filterManage == undefined ? data.filterManage : obj.filterManage;
+                data.colorManage = obj.colorManage == null || obj.colorManage == undefined ? data.colorManage : obj.colorManage;
 
-                data.tableSync = obj.tableSync == '' || obj.tableSync == null || obj.tableSync == undefined ? data.tableSync : obj.tableSync;
+                data.filterManage = obj.filterManage == null || obj.filterManage == undefined ? data.filterManage : obj.filterManage;
 
-                data.tableFetch = obj.tableFetch == '' || obj.tableFetch == null || obj.tableFetch == undefined ? data.tableFetch : obj.tableFetch;
+                data.tableSync = obj.tableSync == null || obj.tableSync == undefined ? data.tableSync : obj.tableSync;
 
-                data.tableInsert = obj.tableInsert == '' || obj.tableInsert == null || obj.tableInsert == undefined ? data.tableInsert : obj.tableInsert;
+                data.tableFetch = obj.tableFetch == null || obj.tableFetch == undefined ? data.tableFetch : obj.tableFetch;
+
+                data.tableInsert = obj.tableInsert == null || obj.tableInsert == undefined ? data.tableInsert : obj.tableInsert;
 
                 data.since = new Date()
-                
+                console.log(data,obj);
                 data.save((error, datas) => {
                     if (error) reject(error);
                     resolve(datas);

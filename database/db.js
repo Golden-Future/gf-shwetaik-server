@@ -16,17 +16,18 @@ let UserScheme = new Schema({
 });
 
 let SystemOptionsScheme = new Schema({
-    user_id: { type: Number},
-    roleName: { type: String},
+    roleName: { type: String },
+    user_id:  {type: String},
     userManage: { type: Boolean },
-    roleMannage: { type: Boolean },
+    roleManage: { type: Boolean },
     languageManage: { type: Boolean },
     tableManage: { type: Boolean },
     colorManage: { type: Boolean },
     filterManage: {type: Boolean},
     tableSync: { type: Boolean },
     tableFetch: { type: Boolean },
-    tableInsert: {type: Boolean},
+    tableInsert: { type: Boolean },
+    lang: { type: String},
     since: { type: Date, required: true },
 });
 
@@ -53,11 +54,13 @@ let FilterScheme = new Schema({
     value: { type: String },
     table_id: { type: Number },
     role_id: { type: Number },
+    length: {type: Number},
     user_id: { type: Number },
     since: { type: Date }
 })
 let TableScheme = new Schema({
     tableName: { type: String },
+    code: {type: String},
     since: { type: Date }
 });
 

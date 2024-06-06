@@ -30,6 +30,7 @@ let update = (obj) => {
             } else {
                 let object = {
                     tableName: obj.tableName == null || obj.tableName == undefined ? data.tableName : obj.tableName,
+                    code: obj.code == null || obj.code == undefined ? data.code : obj.code,
                     since: new Date()
                 };
                 object.save((error, datas) => {

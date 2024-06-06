@@ -32,6 +32,8 @@ let update = (obj) => {
 
                 data.value = obj.value == '' || obj.value == null || obj.value == undefined ? data.value : obj.value;
 
+                data.length = obj.length == '' || obj.length == null || obj.length == undefined ? data.length : obj.length;
+
                 data.table_id = obj.table_id == '' || obj.table_id == null || obj.table_id == undefined ? data.table_id : obj.table_id;
 
                 data.role_id = obj.role_id == '' || obj.role_id == null || obj.role_id == undefined ? data.role_id : obj.role_id;

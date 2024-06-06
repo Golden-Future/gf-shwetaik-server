@@ -52,7 +52,7 @@ module.exports = () => {
                     })
                     .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
             })
-            .catch((erro) => res.jsonn({ con: false, data: erro, msg: `Error` }));
+            .catch((erro) => res.json({ con: false, data: erro, msg: `Error` }));
     })
     
     router.post('/superuser/register/user', (req, res) => {
@@ -189,11 +189,12 @@ module.exports = () => {
 
     router.post('/superuser/save/systemOption', (req, res) => {
         let obj = {
-            user_id: req.body.user_id,
             roleName: req.body.roleName,
             userManage: req.body.userManage,
-            roleMannage: req.body.roleMannage,
+            roleManage: req.body.roleManage,
             languageManage: req.body.languageManage,
+            lang: req.body.lang,
+            user_id: req.body.user_id,
             tableManage: req.body.tableManage,
             colorManage: req.body.colorManage,
             filterManage: req.body.filterManage,
@@ -209,19 +210,20 @@ module.exports = () => {
 
     router.post('/superuser/update/systemOption', (req, res) => {
         let obj = {
-            user_id: req.body.user_id,
             roleName: req.body.roleName,
             userManage: req.body.userManage,
-            roleMannage: req.body.roleMannage,
+            roleManage: req.body.roleManage,
             languageManage: req.body.languageManage,
             tableManage: req.body.tableManage,
             colorManage: req.body.colorManage,
             filterManage: req.body.filterManage,
+            lang: req.body.lang,
+            user_id: req.body.user_id,
             tableSync: req.body.tableSync,
             tableFetch: req.body.tableFetch,
             tableInsert: req.body.tableInsert,
+            systemOption_id: req.body.systemOption_id
         };
-
         SystemOption.update(obj)
             .then((result) => res.json({ con: true, data: result, msg: `Success` }))
             .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
@@ -246,7 +248,8 @@ module.exports = () => {
 
     router.post('/superuser/save/table', (req, res) => {
         let table = {
-            tableName: req.body.tableName
+            tableName: req.body.tableName,
+            code: req.body.code
         };
         Table.save(table)
             .then((result) => res.json({ con: true, data: result, msg: `Success` }))
@@ -256,6 +259,7 @@ module.exports = () => {
     router.post("/superuser/update/table", (req, res) => {
         let obj = {
             tableName: req.body.tableName,
+            code: req.body.code,
             table_id: req.body.table_id
         };
         Table.update(obj)
@@ -284,6 +288,7 @@ module.exports = () => {
         let filter = {
             key: req.body.key,
             value: req.body.value,
+            length: req.body.length,
             table_id: req.body.table_id,
             role_id: req.body.role_id,
             user_id: req.body.user_id,
@@ -297,6 +302,7 @@ module.exports = () => {
         let filter = {
             key: req.body.key,
             value: req.body.value,
+            length: req.body.length,
             table_id: req.body.table_id,
             role_id: req.body.role_id,
             user_id: req.body.user_id,
@@ -373,7 +379,7 @@ module.exports = () => {
     });
     
       // mobile
-  router.get("/alldata", (req, res) => {
+    router.get("/alldata", (req, res) => {
     fs.readFile("stock.json", "utf8", (err, data) => {
       if (err) {
         console.error(err);
@@ -381,10 +387,10 @@ module.exports = () => {
         res.send(data);
       }
     });
-  });
+    });
 
       // desktp & mobile
-  router.get("/addalldata", (req, res) => {
+    router.get("/addalldata", (req, res) => {
     fs.readFile("add.json", "utf8", (err, data) => {
       if (err) {
         console.error(err);
@@ -392,10 +398,10 @@ module.exports = () => {
         res.send(data);
       }
     });
-  });
+    });
 
-  // mobile
-  router.post("/add", (req, res) => {
+      // mobile
+    router.post("/add", (req, res) => {
     let datas = req.body.data;
     // let json = JSON.parse(datas);
     console.log(datas);
@@ -406,7 +412,7 @@ module.exports = () => {
       }
       res.send("Data added successfully!");
     });
-  });
+    });
 
 
     return router;

@@ -56,11 +56,12 @@ let destory = (id) => {
             resolve(data);
         })
     })
-}
+};
+
 module.exports = {
     all,
     save,
     update,
     find,
     destory
-}
+};
