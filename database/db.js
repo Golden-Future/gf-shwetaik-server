@@ -58,16 +58,30 @@ let FilterScheme = new Schema({
     user_id: { type: Number },
     since: { type: Date }
 })
+
 let TableScheme = new Schema({
     tableName: { type: String },
     code: {type: String},
     since: { type: Date }
 });
 
+let choosingColumnScheme = new Schema({
+    name: { type: String },
+    checked: { type: Boolean },
+    tableName: { type: String },
+    user_id: { type: String },
+    since: { type: Date },
+})
+
 
 RoleScheme.plugin(autoI, { field: "role_id" });
 RoleScheme.plugin(paginate);
 let Role = mongoose.model("Roles", RoleScheme);
+
+choosingColumnScheme.plugin(autoI, { field: "choosingColumn_id" });
+choosingColumnScheme.plugin(paginate);
+let ChoosingColumn = mongoose.model("ChoosingColumn", choosingColumnScheme);
+
 
 UserScheme.plugin(autoI, { field: "user_id" });
 UserScheme.plugin(paginate);
@@ -101,5 +115,6 @@ module.exports = {
     SystemOption,
     Tables,
     Filter,
+    ChoosingColumn,
     Color
 }

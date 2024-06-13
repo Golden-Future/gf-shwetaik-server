@@ -26,6 +26,8 @@ module.exports = () => {
     let Table = require('../database/table');
     let Color = require('../database/color');
     let Filter = require('../database/filter');
+    let CC = require('../database/choosingColumn');
+
 
     // ****** USER ******* //
 
@@ -236,6 +238,13 @@ module.exports = () => {
         .catch((error) => res.json({ con: false, data: error, msg: `Error` }));        
     })
 
+    router.get('/superuser/search/systemOption/:uid', (req, res) => {
+        let uid = req.param('uid');
+        SystemOption.findByUid(uid)
+        .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+        .catch((error) => res.json({ con: false, data: error, msg: `Error` })); 
+    })
+
     // ****** SystemOption ******* //
 
     // ****** Table ******* //
@@ -363,6 +372,45 @@ module.exports = () => {
 
     // ****** Color ******* //
 
+    // ****** CC ******* //
+
+    router.post('/superuser/findCC', (req, res) => {
+        let obj = {
+            tableName: req.body.tableName,
+            user_id: req.body.user_id
+        }
+        CC.findByTable(obj)
+        .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+        .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    })
+
+    router.post('/superuser/save/CC', (req, res) => {
+        let obj = {
+            name: req.body.name,
+            checked: req.body.checked,
+            tableName: req.body.tableName,
+            user_id: req.body.user_id,
+        };
+        CC.save(obj)
+            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    });
+
+    router.post('/superuser/update/CC', (req, res) => {
+        let obj = {
+            name: req.body.name,
+            checked: req.body.checked,
+            tableName: req.body.tableName,
+            user_id: req.body.user_id,
+        };
+        CC.update(obj)
+            .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+            .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    });
+
+    // ****** CC ******* //
+
+
 
     router.post("/all", (req, res) => {
         let data = req.body.data;
@@ -403,7 +451,6 @@ module.exports = () => {
       // mobile
     router.post("/add", (req, res) => {
     let datas = req.body.data;
-    // let json = JSON.parse(datas);
     console.log(datas);
     fs.writeFile("add.json", JSON.stringify(datas, null, 2), "utf8", (err) => {
       if (err) {
@@ -415,7 +462,7 @@ module.exports = () => {
     });
 
 
-    return router;
 
+    return router;
 
 }
