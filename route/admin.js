@@ -450,9 +450,10 @@ module.exports = () => {
 
       // mobile
     router.post("/add", (req, res) => {
-    let datas = req.body.data;
+        let datas = req.body.data;
+        let tname = req.body.tName;
     console.log(datas);
-    fs.writeFile("add.json", JSON.stringify(datas, null, 2), "utf8", (err) => {
+    fs.writeFile(`${tname}.json`, JSON.stringify(datas, null, 2), "utf8", (err) => {
       if (err) {
         res.send("Error writing file:", err);
         return;
