@@ -427,8 +427,9 @@ module.exports = () => {
     });
     
       // mobile
-    router.get("/alldata", (req, res) => {
-    fs.readFile("stock.json", "utf8", (err, data) => {
+    router.post("/alldata", (req, res) => {
+        let tname = req.body.tName;
+    fs.readFile(`${tname}.json`, "utf8", (err, data) => {
       if (err) {
         console.error(err);
       } else {
