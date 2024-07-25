@@ -30,6 +30,7 @@ let userRoute = require("./route/user")(express, jwt, passport, bodyParser);
 let colorRoute = require("./route/color")(express, jwt, passport, bodyParser);
 let systemRoute = require("./route/system")(express, jwt, passport, bodyParser);
 let roleRoute = require("./route/role")(express, jwt, passport, bodyParser);
+let dataSyncRoute = require("./route/dataSync")(express, jwt, passport, bodyParser);
 
 passport.use(Strategy);
 app.use(bodyParser.json());
@@ -41,6 +42,7 @@ app.use("/user", userRoute);
 app.use("/color", colorRoute);
 app.use("/system", systemRoute);
 app.use("/role", roleRoute);
+app.use("/dataSync", dataSyncRoute);
 
 app.listen(process.env.PORT, (_) => {
   console.log(`Server is running at ${process.env.PORT}`);
