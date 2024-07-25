@@ -1,21 +1,9 @@
 let fs = require("fs");
 let unique_username = require("unique-username-generator");
-
 let express = require("express");
-const User = require("../database/user");
-const bcrypt = require("../helper/pass");
-const jwt = require("jsonwebtoken");
-const Role = require("../database/role");
-const Language = require("../database/language");
-const SystemOption = require("../database/systemOption");
-const Table = require("../database/table");
-const Filter = require("../database/filter");
-const Color = require("../database/color");
-const CC = require("../database/choosingColumn");
 module.exports = () => {
     let router = express.Router();
     let jwt = require("jsonwebtoken"),
-        passport = require("passport"),
         bcrypt = require("../helper/pass");
     // Database file import
 
