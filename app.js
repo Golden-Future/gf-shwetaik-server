@@ -13,12 +13,12 @@ let jwtOption = {};
 jwtOption.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOption.secretOrKey = process.env.SECRET;
 
-let myS = new JwtStrategy(jwtOption, (payload, done) => {
+let Strategy = new JwtStrategy(jwtOption, (payload, done) => {
   let email = payload.email;
   let name = payload.name;
-  User.findByAdminemail(email)
+  User.findEmail(email)
     .then((admin) => {
-      if (admin.name == name) {
+      if (admin.name === name) {
         done(null, admin);
       }
     })
@@ -26,15 +26,21 @@ let myS = new JwtStrategy(jwtOption, (payload, done) => {
 });
 
 let adminRoute = require("./route/admin")(express, jwt, passport, bodyParser);
+let userRoute = require("./route/user")(express, jwt, passport, bodyParser);
+let colorRoute = require("./route/color")(express, jwt, passport, bodyParser);
+let systemRoute = require("./route/system")(express, jwt, passport, bodyParser);
+let roleRoute = require("./route/role")(express, jwt, passport, bodyParser);
 
-let path = require("path");
-
-passport.use(myS);
+passport.use(Strategy);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors());
 app.use("/admin", adminRoute);
+app.use("/user", userRoute);
+app.use("/color", colorRoute);
+app.use("/system", systemRoute);
+app.use("/role", roleRoute);
 
 app.listen(process.env.PORT, (_) => {
   console.log(`Server is running at ${process.env.PORT}`);

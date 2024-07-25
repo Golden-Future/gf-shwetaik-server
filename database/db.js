@@ -9,15 +9,15 @@ let UserScheme = new Schema({
   phone: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String },
-  role: { type: String, required: true },
+  role_id: { type: Schema.Types.ObjectId, ref: "Roles", required: true },
   name: { type: String },
   userName: { type: String },
+  lang: { type: String },
   since: { type: Date, required: true },
 });
 
 let SystemOptionsScheme = new Schema({
-  roleName: { type: String },
-  user_id: { type: String },
+  role_id: { type: Schema.Types.ObjectId, ref: "Roles", required: true },
   userManage: { type: Boolean },
   roleManage: { type: Boolean },
   languageManage: { type: Boolean },
@@ -27,7 +27,6 @@ let SystemOptionsScheme = new Schema({
   tableSync: { type: Boolean },
   tableFetch: { type: Boolean },
   tableInsert: { type: Boolean },
-  lang: { type: String },
   since: { type: Date, required: true },
 });
 
@@ -43,35 +42,49 @@ let RoleScheme = new Schema({
 });
 
 let ColorScheme = new Schema({
-  primary: { type: String },
-  secondary: { type: String },
-  third: { type: String },
+  colorCode: { type: String },
   since: { type: Date, required: true },
-});
-
-let FilterScheme = new Schema({
-  key: { type: String },
-  value: { type: String },
-  tableName: { type: Number },
-  roleName: { type: Number },
-  length: { type: Number },
-  user_id: { type: Number },
-  since: { type: Date },
 });
 
 let TableScheme = new Schema({
   tableName: { type: String },
-  code: { type: String },
+  description: { type: String },
+  color_id: { type: Schema.Types.ObjectId, ref: "Colors", required: true },
   since: { type: Date },
 });
 
 let choosingColumnScheme = new Schema({
-  name: { type: String },
+  role_id: { type: Schema.Types.ObjectId, ref: "Roles", required: true },
   checked: { type: Boolean },
-  tableName: { type: String },
-  user_id: { type: String },
+  table_id: { type: Schema.Types.ObjectId, ref: "Tables", required: true },
   since: { type: Date },
 });
+
+let announcementRoleScheme = new Schema({
+  role_id: { type: Schema.Types.ObjectId, ref: "Roles", required: true },
+  since: { type: Date },
+});
+
+let announcementScheme = new Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  announcementrole_id: {
+    type: Schema.Types.ObjectId,
+    ref: "AnnouncementRoles",
+    required: true,
+  },
+});
+
+announcementScheme.plugin(autoI, { field: "announcement_id" });
+announcementScheme.plugin(paginate);
+let Announcement = mongoose.model("Announcement", announcementScheme);
+
+announcementRoleScheme.plugin(autoI, { field: "announcementroles_id" });
+announcementRoleScheme.plugin(paginate);
+let AnnouncementRole = mongoose.model(
+  "AnnouncementRoles",
+  announcementRoleScheme
+);
 
 RoleScheme.plugin(autoI, { field: "role_id" });
 RoleScheme.plugin(paginate);
@@ -97,10 +110,6 @@ TableScheme.plugin(autoI, { field: "table_id" });
 TableScheme.plugin(paginate);
 let Tables = mongoose.model("Tables", TableScheme);
 
-FilterScheme.plugin(autoI, { field: "filter_id" });
-FilterScheme.plugin(paginate);
-let Filter = mongoose.model("Filters", FilterScheme);
-
 ColorScheme.plugin(autoI, { field: "color_id" });
 ColorScheme.plugin(paginate);
 let Color = mongoose.model("Colors", ColorScheme);
@@ -111,7 +120,8 @@ module.exports = {
   Language,
   SystemOption,
   Tables,
-  Filter,
+  Announcement,
+  AnnouncementRole,
   ChoosingColumn,
   Color,
 };
