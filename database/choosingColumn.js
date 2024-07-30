@@ -22,28 +22,25 @@ let save = (obj) => {
     })
 };
 
-// user_id: { type: String },
-// since: { type: Date },
-
 let update = (obj) => {
     return new Promise((resolve, reject) => {
         CC.findOne({ choosingColumn_id: obj.choosingColumn_id }, (err, data) => {
             if (err) {
                 reject(err)
             } else {
-                data.name = obj.name == '' || obj.name == null || obj.name == undefined ? data.name : obj.name;
+                data.name = obj.name === '' || obj.name == null || false ? data.name : obj.name;
 
-                data.checked = obj.checked == '' || obj.checked == null || obj.checked == undefined ? data.checked : obj.checked;
+                data.checked = obj.checked === '' || obj.checked == null || false ? data.checked : obj.checked;
 
-                data.tableName = obj.tableName == '' || obj.tableName == null || obj.tableName == undefined ? data.tableName : obj.tableName;
+                data.tableName = obj.tableName === '' || obj.tableName == null || false ? data.tableName : obj.tableName;
 
-                data.user_id = obj.user_id == '' || obj.user_id == null || obj.user_id == undefined ? data.user_id : obj.user_id;
+                data.user_id = obj.user_id === '' || obj.user_id == null || false ? data.user_id : obj.user_id;
 
                 data.since = new Date()
                 
-                data.save((error, datas) => {
+                data.save((error, result) => {
                     if (error) reject(error);
-                    resolve(datas);
+                    resolve(result);
                 })
             }
         })
@@ -69,9 +66,9 @@ let findByTable = (obj) => {
     })
 };
 
-let destory = (id) => {
+let remove = (id) => {
     return new Promise((resolve, reject) => {
-        Color.deleteOne({ choosingColumn_id: id }, (err, data) => {
+        CC.deleteOne({ choosingColumn_id: id }, (err, data) => {
             if (err) reject(err);
             resolve(data);
         })
@@ -82,6 +79,6 @@ module.exports = {
     save,
     update,
     find,
-    destory,
+    remove,
     findByTable
 }
