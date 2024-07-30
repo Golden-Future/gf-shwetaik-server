@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 let paginate = require("mongoose-paginate");
 let url = "mongodb://127.0.0.1:27017/shweTaikInternational";
-const connect = mongoose.connect(url, { useNewUrlParser: true });
+mongoose.connect(url, { useNewUrlParser: true })
+    .then(() => console.log("Connected to database"))
+    .catch((err) => console.log(err));
 let autoI = require("simple-mongoose-autoincrement");
 let Schema = mongoose.Schema;
 
@@ -68,7 +70,7 @@ let announcementRoleScheme = new Schema({
 let announcementScheme = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  announcementrole_id: {
+  announcementRole_id: {
     type: Schema.Types.ObjectId,
     ref: "AnnouncementRoles",
     required: true,
@@ -79,7 +81,7 @@ announcementScheme.plugin(autoI, { field: "announcement_id" });
 announcementScheme.plugin(paginate);
 let Announcement = mongoose.model("Announcement", announcementScheme);
 
-announcementRoleScheme.plugin(autoI, { field: "announcementroles_id" });
+announcementRoleScheme.plugin(autoI, { field: "announcementRoles_id" });
 announcementRoleScheme.plugin(paginate);
 let AnnouncementRole = mongoose.model(
   "AnnouncementRoles",
