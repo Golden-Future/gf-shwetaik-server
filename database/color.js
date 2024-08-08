@@ -28,11 +28,7 @@ let update = (obj) => {
             if (err) {
                 reject(err)
             } else {
-                data.primary = obj.primary == '' || obj.primary == null || obj.primary == undefined ? data.primary : obj.primary;
-
-                data.secondary = obj.secondary == '' || obj.secondary == null || obj.secondary == undefined ? data.secondary : obj.secondary;
-
-                data.third = obj.third == '' || obj.third == null || obj.third == undefined ? data.third : obj.third;
+                data.colorCode = obj.colorCode == '' || obj.colorCode == null || obj.colorCode == undefined ? data.colorCode : obj.colorCode;
 
                 data.since = new Date()
                 

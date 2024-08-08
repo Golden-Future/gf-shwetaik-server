@@ -25,8 +25,8 @@ module.exports = () => {
   let SystemOption = require("../database/systemOption");
   let Table = require("../database/table");
   let Color = require("../database/color");
-  let Filter = require("../database/filter");
   let CC = require("../database/choosingColumn");
+  let Ann = require('../database/announcement');
 
   // ****** USER ******* //
 
@@ -75,13 +75,8 @@ module.exports = () => {
   });
 
   router.post("/superuser/register/user", (req, res) => {
-    let phone = req.body.phone;
-    let email = req.body.email;
-    let password = req.body.password;
-    let role = req.body.role;
-    let name = req.body.name;
-    let userName = unique_username.generateUsername("", 3, 20);
-
+    const { phone, email, password, role_id: role, name, lang } = req.body;
+    const userName = unique_username.generateUsername("", 3, 20);    
     bcrypt
       .encrypt(password)
       .then((result) => {
@@ -89,9 +84,10 @@ module.exports = () => {
           phone: phone,
           email: email,
           password: result,
-          role: role,
+          role_id: role,
           name: name,
           userName: userName,
+          lang: lang
         };
         User.save(obj)
           .then((data) => res.json({ con: true, data: data, msg: `Save` }))
@@ -108,18 +104,24 @@ module.exports = () => {
     let obj = {
       phone: req.body.phone,
       email: req.body.email,
-      role: req.body.role,
+      role_id: req.body.role_id,
       name: req.body.name,
       userName: req.body.userName,
       user_id: req.body.user_id,
-      password: null,
+      lang: req.body.lang,
+      password: req.body.password,
     };
     User.update(obj)
       .then((ree) =>
         res.json({ con: true, data: ree, msg: `Update Successfully!` })
       )
-      .catch((error) =>
-        res.json({ con: false, data: error, msg: `Error Update in User data` })
+      .catch((error) => {
+        if (error.code == 1100) {
+          res.json({ con: false, data: error, msg: `Unique key error in  User data` })
+        } else {
+          res.json({ con: false, data: error, msg: `Error Update in User data` })
+        }
+      }
       );
   });
 
@@ -237,12 +239,10 @@ module.exports = () => {
 
   router.post("/superuser/save/systemOption", (req, res) => {
     let obj = {
-      roleName: req.body.roleName,
       userManage: req.body.userManage,
       roleManage: req.body.roleManage,
       languageManage: req.body.languageManage,
-      lang: req.body.lang,
-      user_id: req.body.user_id,
+      role_id: req.body.role_id,
       tableManage: req.body.tableManage,
       colorManage: req.body.colorManage,
       filterManage: req.body.filterManage,
@@ -258,15 +258,13 @@ module.exports = () => {
 
   router.post("/superuser/update/systemOption", (req, res) => {
     let obj = {
-      roleName: req.body.roleName,
       userManage: req.body.userManage,
       roleManage: req.body.roleManage,
       languageManage: req.body.languageManage,
       tableManage: req.body.tableManage,
       colorManage: req.body.colorManage,
       filterManage: req.body.filterManage,
-      lang: req.body.lang,
-      user_id: req.body.user_id,
+      role_id: req.body.role_id,
       tableSync: req.body.tableSync,
       tableFetch: req.body.tableFetch,
       tableInsert: req.body.tableInsert,
@@ -284,9 +282,10 @@ module.exports = () => {
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });
 
-  router.get("/superuser/search/systemOption/:uid", (req, res) => {
-    let uid = req.param("uid");
-    SystemOption.findByUid(uid)
+  router.get("/superuser/search/systemOption/:roleId", (req, res) => {
+    let uid = req.param('roleId');
+    console.log(uid);
+    SystemOption.findByUid(Number(uid))
       .then((result) => res.json({ con: true, data: result, msg: `Success` }))
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });
@@ -304,7 +303,8 @@ module.exports = () => {
   router.post("/superuser/save/table", (req, res) => {
     let table = {
       tableName: req.body.tableName,
-      code: req.body.code,
+      description: req.body.description,
+      color_id: req.body.color_id
     };
     Table.save(table)
       .then((result) => res.json({ con: true, data: result, msg: `Success` }))
@@ -314,7 +314,8 @@ module.exports = () => {
   router.post("/superuser/update/table", (req, res) => {
     let obj = {
       tableName: req.body.tableName,
-      code: req.body.code,
+      description: req.body.description,
+      color_id: req.body.color_id,
       table_id: req.body.table_id,
     };
     Table.update(obj)
@@ -331,52 +332,6 @@ module.exports = () => {
 
   // ****** Table ******* //
 
-  // ****** Filter ******* //
-
-  router.get("/superuser/all/filter", (req, res) => {
-    Filter.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-  });
-
-  router.post("/superuser/save/filter", (req, res) => {
-    let filter = {
-      key: req.body.key,
-      value: req.body.value,
-      length: req.body.length,
-      tableName: req.body.tableName,
-      roleName: req.body.roleName,
-      user_id: req.body.user_id,
-    };
-    Filter.save(filter)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-  });
-
-  router.post("/superuser/update/filter", (req, res) => {
-    let filter = {
-      key: req.body.key,
-      value: req.body.value,
-      length: req.body.length,
-      tableName: req.body.tableName,
-      roleName: req.body.roleName,
-      user_id: req.body.user_id,
-      filter_id: req.body.filter_id,
-    };
-    Filter.update(filter)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-  });
-
-  router.post("/superuser/delete/filter", (req, res) => {
-    let id = req.body.filter_id;
-    Filter.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
-  });
-
-  // ****** Filter ******* //
-
   // ****** Color ******* //
 
   router.get("/superuser/all/color", (req, res) => {
@@ -387,9 +342,7 @@ module.exports = () => {
 
   router.post("/superuser/save/color", (req, res) => {
     let color = {
-      primary: req.body.primary,
-      secondary: req.body.secondary,
-      third: req.body.third,
+      colorCode: req.body.colorCode,
     };
     Color.save(color)
       .then((result) => res.json({ con: true, data: result, msg: `Success` }))
@@ -398,9 +351,7 @@ module.exports = () => {
 
   router.post("/superuser/update/color", (req, res) => {
     let color = {
-      primary: req.body.primary,
-      secondary: req.body.secondary,
-      third: req.body.third,
+      colorCode: req.body.colorCode,
       color_id: req.body.color_id,
     };
     Color.update(color)
@@ -408,7 +359,7 @@ module.exports = () => {
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });
 
-  router.post("/superuser/delete/delete", (req, res) => {
+  router.post("/superuser/delete/color", (req, res) => {
     let id = req.body.color_id;
     Color.destory(id)
       .then((result) => res.json({ con: true, data: result, msg: `Success` }))
@@ -417,14 +368,103 @@ module.exports = () => {
 
   // ****** Color ******* //
 
+
+  // ****** Announcement ******* //
+
+  router.get("/superuser/all/ann", (req, res) => {
+    Ann.all()
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  /**
+   *   title: { type: String, required: true },
+  description: { type: String, required: true },
+  role: { type: String },
+  since: { type: Date },
+   */
+  router.post("/superuser/save/ann", (req, res) => {
+    let color = {
+      title: req.body.title,
+      description: req.body.description,
+      role: req.body.role,
+    };
+    Ann.save(color)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/update/ann", (req, res) => {
+    let color = {
+      title: req.body.title,
+      description: req.body.description,
+      role: req.body.role,
+      announcement_id: req.body.announcement_id,
+    };
+    Ann.update(color)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/delete/ann", (req, res) => {
+    let id = req.body.announcement_id;
+    Ann.destory(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/find/ann", (req, res) => {
+    let id = req.body.announcement_id;
+    Ann.find(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  // ****** Color ******* //
+
+
   // ****** CC ******* //
 
-  router.post("/superuser/findCC", (req, res) => {
-    let obj = {
-      tableName: req.body.tableName,
-      user_id: req.body.user_id,
+  router.get("/superuser/all/CC", (req, res) => {
+    CC.all()
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/save/CC", (req, res) => {
+    let color = {
+      role_id: req.body.role_id,
+      table_id: req.body.table_id,
+      name: req.body.name,
     };
-    CC.findByTable(obj)
+    CC.save(color)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/update/CC", (req, res) => {
+    let color = {
+      role_id: req.body.role_id,
+      table_id: req.body.table_id,
+      name: req.body.name,
+      choosingColumn_id: req.body.choosingColumn_id,
+    };
+    CC.update(color)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/delete/CC", (req, res) => {
+    let id = req.body.choosingColumn_id;
+    CC.remove(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/findCC", (req, res) => {
+      let table_id = req.body.table_id;
+      let role_id = req.body.role_id;
+      CC.findByTable(table_id,role_id)
       .then((result) => res.json({ con: true, data: result, msg: `Success` }))
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });

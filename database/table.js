@@ -4,9 +4,21 @@ let Table = db.Tables;
 
 let all = () => {
     return new Promise((resolve, reject) => {
-        Table.find({}, (err, data) => {
-            if (err) reject(err);
-            resolve(data);
+        Table.aggregate([
+            {
+                $lookup: {
+                    from: "colors",
+                    localField: "color_id",
+                    foreignField: "color_id",
+                    as:"color"
+                }
+            },
+            {
+                $unwind: "$color"
+            }
+        ]).exec((e, d) => {
+            if (e) reject(e);
+            resolve(d);
         })
     })
 };
@@ -28,12 +40,11 @@ let update = (obj) => {
             if (err) {
                 reject(err)
             } else {
-                let object = {
-                    tableName: obj.tableName == null || obj.tableName == undefined ? data.tableName : obj.tableName,
-                    code: obj.code == null || obj.code == undefined ? data.code : obj.code,
-                    since: new Date()
-                };
-                object.save((error, datas) => {
+                data.tableName= obj.tableName == null || obj.tableName == undefined ? data.tableName : obj.tableName;
+                data.description= obj.description == null || obj.description == undefined ? data.description : obj.description;
+                data.color_id= obj.color_id == null || obj.color_id == undefined ? data.color_id : obj.color_id;
+                data.since= new Date();
+                data.save((error, datas) => {
                     if (error) reject(error);
                     resolve(datas);
                 })
