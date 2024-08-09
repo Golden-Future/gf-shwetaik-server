@@ -27,6 +27,7 @@ module.exports = () => {
   let Color = require("../database/color");
   let CC = require("../database/choosingColumn");
   let Ann = require('../database/announcement');
+  let List = require('../database/tableList');
 
   // ****** USER ******* //
 
@@ -415,6 +416,48 @@ module.exports = () => {
   });
 
   // ****** Color ******* //
+
+
+  router.get("/superuser/all/list", (req, res) => {
+    List.all()
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/save/list", (req, res) => {
+    let color = {
+      list: req.body.list,
+      role_id: req.body.role_id,
+    };
+    List.save(color)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/update/list", (req, res) => {
+    let color = {
+      list: req.body.list,
+      role_id: req.body.role_id,
+      tableList_id: req.body.tableList_id
+    };
+    List.update(color)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/delete/list", (req, res) => {
+    let id = req.body.tableList_id;
+    List.destory(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
+  router.post("/superuser/find/list", (req, res) => {
+    let id = req.body.tableList_id;
+    List.find(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
 
   // ****** CC ******* //
 
