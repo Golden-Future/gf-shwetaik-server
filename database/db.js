@@ -48,6 +48,12 @@ let ColorScheme = new Schema({
   since: { type: Date, required: true },
 });
 
+let TableListScheme = new Schema({
+  list: { type: String },
+  role_id: { type: Number },
+  since: { type: Date }
+});
+
 let TableScheme = new Schema({
   tableName: { type: String, required: true, unique: true },
   description: { type: String },
@@ -73,6 +79,10 @@ let announcementScheme = new Schema({
 UserScheme.plugin(autoI, { field: "user_id" });
 UserScheme.plugin(paginate);
 let User = mongoose.model("Users", UserScheme);
+
+TableListScheme.plugin(autoI, { field: "tableList_id" });
+TableListScheme.plugin(paginate);
+let tableList = mongoose.model("tableLists", TableListScheme);
 
 SystemOptionsScheme.plugin(autoI, { field: "systemOption_id" });
 SystemOptionsScheme.plugin(paginate);
@@ -111,4 +121,5 @@ module.exports = {
   Announcement,
   ChoosingColumn,
   Color,
+  tableList
 };
