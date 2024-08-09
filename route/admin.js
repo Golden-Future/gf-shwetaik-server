@@ -377,12 +377,6 @@ module.exports = () => {
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });
 
-  /**
-   *   title: { type: String, required: true },
-  description: { type: String, required: true },
-  role: { type: String },
-  since: { type: Date },
-   */
   router.post("/superuser/save/ann", (req, res) => {
     let color = {
       title: req.body.title,
@@ -421,7 +415,6 @@ module.exports = () => {
   });
 
   // ****** Color ******* //
-
 
   // ****** CC ******* //
 
