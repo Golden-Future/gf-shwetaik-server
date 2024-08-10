@@ -123,6 +123,31 @@ let find = (id) => {
   });
 };
 
+let findByRole = (id) => {
+  return new Promise((resolve, reject) => {
+    tableList.aggregate([
+      {
+        $match: { role: id }
+      },
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role_id",
+          foreignField: "role_id",
+          as: "role",
+        },
+      },
+      {
+        $unwind: "$role" 
+      }
+    ])
+    .exec((err, data) => {
+      if (err) reject(err);
+      resolve(data[0]); 
+    });
+  });
+};
+
 let destory = (id) => {
   return new Promise((resolve, reject) => {
     tableList.deleteOne({ tableList_id: id }, (err, daa) => {
@@ -138,4 +163,5 @@ module.exports = {
   update,
   find,
   destory,
+  findByRole
 };
