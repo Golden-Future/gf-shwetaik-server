@@ -55,7 +55,7 @@ let all = () => {
   
 let update = (obj) => {
   return new Promise((resolve, reject) => {
-    tableList.findOne({ user_id: obj.tableList_id }, (err, data) => {
+    tableList.findOne({ tableList_id: obj.tableList_id }, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -68,9 +68,10 @@ let update = (obj) => {
           if (error) {
             reject(error);
           } else {
+            console.log(datas)
             tableList.aggregate([
               {
-                $match: { user_id: datas.tableList_id}
+                $match: { tableList_id: datas.tableList_id}
               },
               {
                 $lookup: {
