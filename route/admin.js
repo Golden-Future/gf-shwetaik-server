@@ -484,7 +484,7 @@ module.exports = () => {
   router.post("/superuser/save/CC", (req, res) => {
     let color = {
       role_id: req.body.role_id,
-      table_id: req.body.table_id,
+      tableName: req.body.tableName,
       name: req.body.name,
     };
     CC.save(color)
@@ -495,7 +495,7 @@ module.exports = () => {
   router.post("/superuser/update/CC", (req, res) => {
     let color = {
       role_id: req.body.role_id,
-      table_id: req.body.table_id,
+      tableName: req.body.tableName,
       name: req.body.name,
       choosingColumn_id: req.body.choosingColumn_id,
     };
