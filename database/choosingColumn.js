@@ -18,8 +18,8 @@ let all = () => {
         {
           $lookup: {
             from: "tables",
-            localField: "table_id",
-            foreignField: "table_id",
+            localField: "tableName",
+            foreignField: "tableName",
             as: "table",
           },
         },
