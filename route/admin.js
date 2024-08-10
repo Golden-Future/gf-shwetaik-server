@@ -505,9 +505,9 @@ module.exports = () => {
   });
 
   router.post("/superuser/findCC", (req, res) => {
-      let table_id = req.body.table_id;
+      let tableName = req.body.tableName;
       let role_id = req.body.role_id;
-      CC.findByTable(table_id,role_id)
+      CC.findByTable(tableName,role_id)
       .then((result) => res.json({ con: true, data: result, msg: `Success` }))
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });

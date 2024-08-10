@@ -52,8 +52,8 @@ let save = (obj) => {
               {
                 $lookup: {
                   from: "tables",
-                  localField: "table_id",
-                  foreignField: "table_id",
+                  localField: "tableName",
+                  foreignField: "tableName",
                   as: "table"
                 }
               },
@@ -88,7 +88,7 @@ let update = (obj) => {
             } else {
                 data.name = obj.name === '' || obj.name == null || false ? data.name : obj.name;
                 data.role_id = obj.role_id === '' || obj.role_id == null || false ? data.role_id : obj.role_id;
-                data.table_id = obj.table_id === '' || obj.table_id == null || false ? data.table_id : obj.table_id;
+                data.tableName = obj.tableName === '' || obj.tableName == null || false ? data.tableName : obj.tableName;
                 data.since = new Date()
                 data.save((error, result) => {
                     if (error) reject(error);
@@ -101,7 +101,7 @@ let update = (obj) => {
 
 let findByTable = (t,r) => {
   return new Promise((resolve, reject) => {
-    CC.find({ table_id: t,role_id:r}, (err, data) => {
+    CC.find({ tableName: t,role_id:r}, (err, data) => {
       if (err) reject(err);
       resolve(data);
     })

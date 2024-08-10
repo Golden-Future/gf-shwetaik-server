@@ -63,7 +63,7 @@ let TableScheme = new Schema({
 
 let choosingColumnScheme = new Schema({
   role_id: { type: Number },
-  table_id: { type: Number },
+  tableName: { type: String },
   name: { type: String },
   since: { type: Date },
 });
