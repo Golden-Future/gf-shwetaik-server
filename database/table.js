@@ -62,6 +62,15 @@ let find = (id) => {
     })
 };
 
+let findName = (id) => {
+    return new Promise((resolve, reject) => {
+        Table.findOne({ tableName: id }, (err, data) => {
+            if (err) reject(err);
+            resolve(data);
+        })
+    })
+};
+
 let destory = (id) => {
     return new Promise((resolve, reject) => {
         Table.deleteOne({ table_id: id }, (err, data) => {
@@ -75,5 +84,6 @@ module.exports = {
     save,
     update,
     find,
-    destory
+    destory,
+    findName
 }

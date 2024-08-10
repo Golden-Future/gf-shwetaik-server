@@ -331,6 +331,13 @@ module.exports = () => {
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });
 
+  router.post("/superuser/find/table", (req, res) => {
+    let id = req.body.tableName;
+    Table.findName(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
   // ****** Table ******* //
 
   // ****** Color ******* //
