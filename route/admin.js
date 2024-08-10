@@ -459,6 +459,13 @@ module.exports = () => {
       .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
   });
 
+  router.post("/superuser/find/listbyRole", (req, res) => {
+    let id = req.body.role_id;
+    List.findByRole(id)
+      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
+      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+  });
+
   // ****** CC ******* //
 
   router.get("/superuser/all/CC", (req, res) => {
