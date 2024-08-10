@@ -2,7 +2,7 @@ let db = require("./db");
 let tableList = db.tableList;
 
 let all = () => {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
         tableList.aggregate([
         {
           $lookup: {
@@ -31,7 +31,7 @@ let all = () => {
         if (err) return reject(err);
         tableList.aggregate([
           {
-            $match: { user_id: savedUser.tableList_id } 
+            $match: { tableList_id: savedUser.tableList_id } 
           },
           {
             $lookup: {
@@ -52,10 +52,6 @@ let all = () => {
       });
     });
   };
-  
-//   list: { type: String },
-//   role_id: { type: Number },
-// since: { type: Date }
   
 let update = (obj) => {
   return new Promise((resolve, reject) => {
@@ -100,51 +96,61 @@ let update = (obj) => {
 
 let find = (id) => {
   return new Promise((resolve, reject) => {
-    tableList.aggregate([
-      {
-        $match: { tableList_id: id }
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role" 
+    tableList.findOne({tableList_id: id},(e,d)=>{
+      if (e) {
+        reject(e);
+      } else {
+        tableList.aggregate([
+          {
+         $match: {tableList_id: d.tableList_id}
+          },
+          {
+            $lookup: {
+              from: "roles",
+              localField: "role_id",
+              foreignField: "role_id",
+              as:"role"
+            }
+          },
+          {
+            $unwind: "$role"
+          }
+        ]).exec((er, da) => {
+          if (er) reject(er);
+          resolve(da);
+       })
       }
-    ])
-    .exec((err, data) => {
-      if (err) reject(err);
-      resolve(data[0]); 
-    });
+    })
   });
 };
 
 let findByRole = (id) => {
   return new Promise((resolve, reject) => {
-    tableList.aggregate([
-      {
-        $match: { role: id }
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role" 
+    tableList.findOne({role_id: id},(e,d)=>{
+      if (e) {
+        reject(e);
+      } else {
+        tableList.aggregate([
+          {
+         $match: {tableList_id: d.tableList_id}
+          },
+          {
+            $lookup: {
+              from: "roles",
+              localField: "role_id",
+              foreignField: "role_id",
+              as:"role"
+            }
+          },
+          {
+            $unwind: "$role"
+          }
+        ]).exec((er, da) => {
+          if (er) reject(er);
+          resolve(da);
+       })
       }
-    ])
-    .exec((err, data) => {
-      if (err) reject(err);
-      resolve(data[0]); 
-    });
+    })
   });
 };
 
