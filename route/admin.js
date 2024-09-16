@@ -29,7 +29,61 @@ module.exports = () => {
   let Ann = require('../database/announcement');
   let List = require('../database/tableList');
 
+const { exec } = require('child_process');
+
+router.get('/agents', (req, res) => {
+  // Define the SQL commands
+//  const sqlCommands = `
+   // CONNECT '/home/ACC-0001.FDB' USER 'SYSDBA' PASSWORD 'masterkey';
+   // SELECT * FROM AGENT;
+ // `;
+
+  // Create a command to echo SQL commands and pipe them to isql-fb
+ // const commands = `echo "${sqlCommands}" | isql-fb`;
+
+const sqlCommands = `
+  CONNECT '/home/ACC-0001.FDB' USER 'SYSDBA' PASSWORD 'masterkey';
+  SELECT * FROM AGENT;
+`;
+
+// Create a command to echo SQL commands and pipe them to isql-fb
+const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
+
+  // Execute the commands
+  exec(commands, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error executing commands:', error);
+      return res.status(500).json({ error: 'Error executing commands' });
+    }
+
+    if (stderr) {
+      console.error('stderr:', stderr);
+      return res.status(500).json({ error: 'Error in stderr' });
+    }
+
+    // Return the result
+    res.status(200).json({ data: stdout });
+  });
+});
+
+
   // ****** USER ******* //
+
+  router.get("/superuser/api/v_1/all/user", (req, res) => {
+    User.allU()
+      .then((result) =>
+        res.json({
+          con: true,
+          data: result,
+          msg: "Data Get Success",
+          status: 200,
+          length: result.length,
+        })
+      )
+      .catch((error) =>
+        res.json({ con: false, data: error, msg: `Error`, status: 304 })
+      );
+  });
 
   router.get("/superuser/all/user", (req, res) => {
     User.all()
@@ -572,8 +626,9 @@ module.exports = () => {
   });
 
   // desktp & mobile
-  router.get("/addalldata", (req, res) => {
-    fs.readFile("add.json", "utf8", (err, data) => {
+  router.get("/addalldata/:id", (req, res) => {
+	let tableName = req.param('id');
+    fs.readFile(`${tableName}-input.json`, "utf8", (err, data) => {
       if (err) {
         console.error(err);
       } else {

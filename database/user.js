@@ -1,6 +1,16 @@
 let db = require("./db");
 let User = db.User;
 
+
+let allU = ()=>{
+	return new Promise((resolve,reject)=>{
+	User.find({},(err,d)=>{
+	if(err) reject(err);
+	resolve(d);
+})
+})
+};
+
 let all = () => {
     return new Promise((resolve, reject) => {
       User.aggregate([
@@ -177,4 +187,5 @@ module.exports = {
   find,
   findEmail,
   destory,
+allU
 };
