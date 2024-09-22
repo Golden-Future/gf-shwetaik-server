@@ -1,5 +1,4 @@
 let multer = require("multer");
-let fs = require("fs");
 let unique_username = require("unique-username-generator");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -10,7 +9,6 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
 let express = require("express");
 module.exports = () => {
   let router = express.Router();
