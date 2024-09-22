@@ -26,79 +26,32 @@ module.exports = () => {
   let Table = require("../database/table");
   let Color = require("../database/color");
   let CC = require("../database/choosingColumn");
-  let Ann = require('../database/announcement');
-  let List = require('../database/tableList');
-
-const { exec } = require('child_process');
-
-router.get('/agents', (req, res) => {
-  // Define the SQL commands
-//  const sqlCommands = `
-   // CONNECT '/home/ACC-0001.FDB' USER 'SYSDBA' PASSWORD 'masterkey';
-   // SELECT * FROM AGENT;
- // `;
-
-  // Create a command to echo SQL commands and pipe them to isql-fb
- // const commands = `echo "${sqlCommands}" | isql-fb`;
-
-const sqlCommands = `
-  CONNECT '/home/ACC-0001.FDB' USER 'SYSDBA' PASSWORD 'masterkey';
-  SELECT * FROM AGENT;
-`;
-
-// Create a command to echo SQL commands and pipe them to isql-fb
-const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
-
-  // Execute the commands
-  exec(commands, (error, stdout, stderr) => {
-    if (error) {
-      console.error('Error executing commands:', error);
-      return res.status(500).json({ error: 'Error executing commands' });
-    }
-
-    if (stderr) {
-      console.error('stderr:', stderr);
-      return res.status(500).json({ error: 'Error in stderr' });
-    }
-
-    // Return the result
-    res.status(200).json({ data: stdout });
-  });
-});
-
+  let Ann = require("../database/announcement");
+  let List = require("../database/tableList");
+  let encrypt = require("../helper/e2e");
 
   // ****** USER ******* //
 
+  let response = (data, status) => {
+    let obj = {
+      con: status,
+      data: status == true ? encrypt.encrypt(JSON.stringify(data)) : data,
+      message: status == true ? "Success" : "Unsuccessful",
+      status: status == true ? 200 : 500,
+      length: status == true ? data.length : 0,
+    };
+    return obj;
+  };
   router.get("/superuser/api/v_1/all/user", (req, res) => {
     User.allU()
-      .then((result) =>
-        res.json({
-          con: true,
-          data: result,
-          msg: "Data Get Success",
-          status: 200,
-          length: result.length,
-        })
-      )
-      .catch((error) =>
-        res.json({ con: false, data: error, msg: `Error`, status: 304 })
-      );
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.get("/superuser/all/user", (req, res) => {
     User.all()
-      .then((result) =>
-        res.json({
-          con: true,
-          data: result,
-          msg: "Data Get Success",
-          status: 200,
-          length: result.length,
-        })
-      )
-      .catch((error) =>
-        res.json({ con: false, data: error, msg: `Error`, status: 304 })
-      );
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/login/user", (req, res) => {
@@ -112,10 +65,11 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
             if (data) {
               let payload = { email: result.email, name: result.name };
               let token = jwt.sign(payload, process.env.SECRET);
+              let data = encrypt.encrypt(JSON.stringify(result));
               res.json({
                 con: true,
                 token: token,
-                data: result,
+                data: data,
                 msg: `Login Successful!`,
               });
             } else {
@@ -131,7 +85,7 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
 
   router.post("/superuser/register/user", (req, res) => {
     const { phone, email, password, role_id: role, name, lang } = req.body;
-    const userName = unique_username.generateUsername("", 3, 20);    
+    const userName = unique_username.generateUsername("", 3, 20);
     bcrypt
       .encrypt(password)
       .then((result) => {
@@ -142,10 +96,13 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
           role_id: role,
           name: name,
           userName: userName,
-          lang: lang
+          lang: lang,
         };
         User.save(obj)
-          .then((data) => res.json({ con: true, data: data, msg: `Save` }))
+          .then((data) => {
+            let dataa = encrypt.encrypt(JSON.stringify(data));
+            res.json({ con: true, data: dataa, msg: `Save` });
+          })
           .catch((error) =>
             res.json({ con: false, data: error, msg: "User Save Erorr" })
           );
@@ -167,26 +124,29 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       password: req.body.password,
     };
     User.update(obj)
-      .then((ree) =>
-        res.json({ con: true, data: ree, msg: `Update Successfully!` })
-      )
+      .then((result) => res.json(response(result, true)))
       .catch((error) => {
         if (error.code == 1100) {
-          res.json({ con: false, data: error, msg: `Unique key error in  User data` })
+          res.json({
+            con: false,
+            data: error,
+            msg: `Unique key error in  User data`,
+          });
         } else {
-          res.json({ con: false, data: error, msg: `Error Update in User data` })
+          res.json({
+            con: false,
+            data: error,
+            msg: `Error Update in User data`,
+          });
         }
-      }
-      );
+      });
   });
 
   router.post("/superuser/delete/user", (req, res) => {
     let id = req.body.user_id;
     User.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: "Success" }))
-      .catch((err) =>
-        res.json({ con: false, data: err, msg: `Error in Delete` })
-      );
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** USER ******* //
@@ -195,15 +155,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
 
   router.get("/superuser/all/role", (req, res) => {
     Role.all()
-      .then((result) =>
-        res.json({
-          con: true,
-          data: result,
-          msg: `Success`,
-          length: result.length,
-        })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/role", (req, res) => {
@@ -211,10 +164,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       roleName: req.body.roleName,
     };
     Role.save(obj)
-      .then((result) =>
-        res.json({ con: true, data: result, msg: `Save Successfull` })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/role", (req, res) => {
@@ -223,19 +174,15 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       role_id: req.body.role_id,
     };
     Role.update(obj)
-      .then((result) =>
-        res.json({ con: true, data: result, msg: `Update Successfull` })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/role", (req, res) => {
     let id = req.body.role_id;
     Role.destory(id)
-      .then((result) =>
-        res.json({ con: true, data: result, msg: `Delete Successfull` })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** ROLE ******* //
@@ -244,8 +191,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
 
   router.get("/superuser/all/language", (req, res) => {
     Language.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/language", (req, res) => {
@@ -254,10 +201,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       en: req.body.en,
     };
     Language.save(obj)
-      .then((result) =>
-        res.json({ con: true, data: result, msg: `Save Successfully` })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/language", (req, res) => {
@@ -267,19 +212,15 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       language_id: req.body.language_id,
     };
     Language.update(obj)
-      .then((result) =>
-        res.json({ con: true, data: result, msg: `Update Successfully` })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/language", (req, res) => {
     let id = req.body.language_id;
     Language.destory(id)
-      .then((result) =>
-        res.json({ con: true, data: result, msg: `Delete Successfully` })
-      )
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** Language ******* //
@@ -288,8 +229,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
 
   router.get("/superuser/all/systemOption", (req, res) => {
     SystemOption.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/systemOption", (req, res) => {
@@ -307,8 +248,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
     };
 
     SystemOption.save(obj)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/systemOption", (req, res) => {
@@ -326,23 +267,23 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       systemOption_id: req.body.systemOption_id,
     };
     SystemOption.update(obj)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/systemOption", (req, res) => {
     let id = req.body.systemOption_id;
     SystemOption.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.get("/superuser/search/systemOption/:roleId", (req, res) => {
-    let uid = req.param('roleId');
+    let uid = req.param("roleId");
     console.log(uid);
     SystemOption.findByUid(Number(uid))
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** SystemOption ******* //
@@ -351,19 +292,19 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
 
   router.get("/superuser/all/table", (req, res) => {
     Table.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/table", (req, res) => {
     let table = {
       tableName: req.body.tableName,
       description: req.body.description,
-      color_id: req.body.color_id
+      color_id: req.body.color_id,
     };
     Table.save(table)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/table", (req, res) => {
@@ -374,22 +315,22 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       table_id: req.body.table_id,
     };
     Table.update(obj)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/table", (req, res) => {
     let id = req.body.table_id;
     Table.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/find/table", (req, res) => {
     let id = req.body.tableName;
     Table.findName(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** Table ******* //
@@ -398,8 +339,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
 
   router.get("/superuser/all/color", (req, res) => {
     Color.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/color", (req, res) => {
@@ -407,8 +348,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       colorCode: req.body.colorCode,
     };
     Color.save(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/color", (req, res) => {
@@ -417,26 +358,25 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       color_id: req.body.color_id,
     };
     Color.update(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/color", (req, res) => {
     let id = req.body.color_id;
     Color.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** Color ******* //
-
 
   // ****** Announcement ******* //
 
   router.get("/superuser/all/ann", (req, res) => {
     Ann.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/ann", (req, res) => {
@@ -446,8 +386,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       role: req.body.role,
     };
     Ann.save(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/ann", (req, res) => {
@@ -458,31 +398,30 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       announcement_id: req.body.announcement_id,
     };
     Ann.update(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/ann", (req, res) => {
     let id = req.body.announcement_id;
     Ann.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/find/ann", (req, res) => {
     let id = req.body.announcement_id;
     Ann.find(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** Color ******* //
 
-
   router.get("/superuser/all/list", (req, res) => {
     List.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/list", (req, res) => {
@@ -491,48 +430,48 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       role_id: req.body.role_id,
     };
     List.save(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/list", (req, res) => {
     let color = {
       list: req.body.list,
       role_id: req.body.role_id,
-      tableList_id: req.body.tableList_id
+      tableList_id: req.body.tableList_id,
     };
     List.update(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/list", (req, res) => {
     let id = req.body.tableList_id;
     List.destory(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/find/list", (req, res) => {
     let id = req.body.tableList_id;
     List.find(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/find/listbyRole", (req, res) => {
     let id = req.body.role_id;
     List.findByRole(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** CC ******* //
 
   router.get("/superuser/all/CC", (req, res) => {
     CC.all()
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/CC", (req, res) => {
@@ -542,8 +481,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       name: req.body.name,
     };
     CC.save(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/CC", (req, res) => {
@@ -554,23 +493,23 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       choosingColumn_id: req.body.choosingColumn_id,
     };
     CC.update(color)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/CC", (req, res) => {
     let id = req.body.choosingColumn_id;
     CC.remove(id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/findCC", (req, res) => {
-      let tableName = req.body.tableName;
-      let role_id = req.body.role_id;
-      CC.findByTable(tableName,role_id)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+    let tableName = req.body.tableName;
+    let role_id = req.body.role_id;
+    CC.findByTable(tableName, role_id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/CC", (req, res) => {
@@ -581,8 +520,8 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       user_id: req.body.user_id,
     };
     CC.save(obj)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/CC", (req, res) => {
@@ -593,68 +532,11 @@ const commands = `echo "${sqlCommands.replace(/"/g, '\\"')}" | isql-fb`;
       user_id: req.body.user_id,
     };
     CC.update(obj)
-      .then((result) => res.json({ con: true, data: result, msg: `Success` }))
-      .catch((error) => res.json({ con: false, data: error, msg: `Error` }));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ****** CC ******* //
-
-  router.post("/all", (req, res) => {
-    let data = req.body.data;
-    let json = JSON.parse(data);
-    let fileName = `${req.body.name}.json`;
-    fs.writeFile(fileName, JSON.stringify(json, null, 2), (err) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send("Error updating stock data");
-        return;
-      }
-      res.status(200).send("Stock data updated successfully");
-    });
-  });
-
-  // mobile
-  router.post("/alldata", (req, res) => {
-    let tname = req.body.tName;
-    fs.readFile(`${tname}.json`, "utf8", (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        res.send(data);
-      }
-    });
-  });
-
-  // desktp & mobile
-  router.get("/addalldata/:id", (req, res) => {
-	let tableName = req.param('id');
-    fs.readFile(`${tableName}-input.json`, "utf8", (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        res.send(data);
-      }
-    });
-  });
-
-  // mobile
-  router.post("/add", (req, res) => {
-    let datas = req.body.data;
-    let tname = req.body.tName;
-    console.log(datas);
-    fs.writeFile(
-      `${tname}.json`,
-      JSON.stringify(datas, null, 2),
-      "utf8",
-      (err) => {
-        if (err) {
-          res.send("Error writing file:", err);
-          return;
-        }
-        res.send("Data added successfully!");
-      }
-    );
-  });
 
   return router;
 };

@@ -1,13 +1,13 @@
-require('dotenv').config();
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const passport = require('passport');
-const bodyParser = require('body-parser');
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('./database/user');
-const cors = require('cors');
-const firebird = require('node-firebird');
+require("dotenv").config();
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const passport = require("passport");
+const bodyParser = require("body-parser");
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
+const User = require("./database/user");
+const cors = require("cors");
+const firebird = require("node-firebird");
 
 const app = express();
 
@@ -34,69 +34,49 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-// Existing admin route
-const adminRoute = require('./route/admin')(express, jwt, passport, bodyParser);
-app.use('/admin', adminRoute);
+const adminRoute = require("./route/admin")(express, jwt, passport, bodyParser);
+app.use("/admin", adminRoute);
 
-// New route for Firebird database
 var options = {};
 
-options.host = 'localhost';
+options.host = "localhost";
 options.port = 3050;
-options.database = '/home/ACC-0008.FDB';
-options.user = 'SYSDBA';
-options.password = 'ea7c5a9b';
-options.lowercase_keys = false; // set to true to lowercase keys
-options.role = null; // default
-options.pageSize = 4096; // default when creating database
-options.retryConnectionInterval = 1000; // reconnect interval in case of connection drop
-options.blobAsText = false; // set to true to get blob as text, only affects blob subtype 1
-options.encoding = 'UTF8';
+options.database = "/home/ACC-0008.FDB";
+options.user = "SYSDBA";
+options.password = "ea7c5a9b";
+options.lowercase_keys = false;
+options.role = null;
+options.pageSize = 4096;
+options.retryConnectionInterval = 1000;
+options.blobAsText = false;
+options.encoding = "UTF8";
 
-app.get('/table/:name/:page/:size', (req, res) => {
-    const name = req.params.name;
-    let page = parseInt(req.params.page, 10);
-    let size = parseInt(req.params.size, 10);
+app.get("/table/:name/:page/:size", (req, res) => {
+  const name = req.params.name;
+  let page = parseInt(req.params.page, 10);
+  let size = parseInt(req.params.size, 10);
 
-    // Validate page and size
-    if (isNaN(page) || isNaN(size) || page < 1 || size < 1) {
-        return res.status(400).send('Invalid page or size parameter.');
-    }
+  // Validate page and size
+  if (isNaN(page) || isNaN(size) || page < 1 || size < 1) {
+    return res.status(400).send("Invalid page or size parameter.");
+  }
 
-    const offset = (page - 1) * size;
-    const limit = size;
+  const offset = (page - 1) * size;
+  const limit = size;
 
-    firebird.attach(options, function (err, db) {
-        if (err) {
-            return res.status(500).send('Database connection failed: ' + err.message);
-        }
-
-        // Construct the SQL query with LIMIT and OFFSET
-        const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${offset + limit}`;
-
-        db.query(query, function (err, result) {
-            if (err) {
-                db.detach();
-                return res.status(500).send('Query failed: ' + err.message);
-            }
-
-            res.json(result);
-            db.detach();
-        });
-    });
-});
-
-app.get('/table/ss/:name', (req, res) => {
-	let name = req.param('name');  
-firebird.attach(options, function (err, db) {
+  firebird.attach(options, function (err, db) {
     if (err) {
-      return res.status(500).send('Database connection failed: ' + err.message);
+      return res.status(500).send("Database connection failed: " + err.message);
     }
 
-    db.query(`SELECT * FROM ${name}`, function (err, result) {
+    const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${
+      offset + limit
+    }`;
+
+    db.query(query, function (err, result) {
       if (err) {
         db.detach();
-        return res.status(500).send('Query failed: ' + err.message);
+        return res.status(500).send("Query failed: " + err.message);
       }
 
       res.json(result);
@@ -105,38 +85,58 @@ firebird.attach(options, function (err, db) {
   });
 });
 
-app.post('/table/find', (req, res) => {
-    const { tableName, uniquekey, data } = req.body;
-
-    if (!tableName || !uniquekey || !data) {
-        return res.status(400).send('Table name, unique key, and data are required.');
+app.get("/table/ss/:name", (req, res) => {
+  let name = req.param("name");
+  firebird.attach(options, function (err, db) {
+    if (err) {
+      return res.status(500).send("Database connection failed: " + err.message);
     }
 
-    firebird.attach(options, function (err, db) {
-        if (err) {
-            return res.status(500).send('Database connection failed: ' + err.message);
-        }
+    db.query(`SELECT * FROM ${name}`, function (err, result) {
+      if (err) {
+        db.detach();
+        return res.status(500).send("Query failed: " + err.message);
+      }
 
-        // Construct the SQL query
-        const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
-
-        // Execute the query
-        db.query(query, [data], function (err, result) {
-            if (err) {
-                db.detach();
-                return res.status(500).send('Query failed: ' + err.message);
-            }
-
-            if (result.length === 0) {
-                return res.json({con: false,msg: "No Data"})
-            }
-
-            res.json({
-	con: true,msg: result
-})
-            db.detach();
-        });
+      res.json(result);
+      db.detach();
     });
+  });
+});
+
+app.post("/table/find", (req, res) => {
+  const { tableName, uniquekey, data } = req.body;
+
+  if (!tableName || !uniquekey || !data) {
+    return res
+      .status(400)
+      .send("Table name, unique key, and data are required.");
+  }
+
+  firebird.attach(options, function (err, db) {
+    if (err) {
+      return res.status(500).send("Database connection failed: " + err.message);
+    }
+
+    const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
+
+    db.query(query, [data], function (err, result) {
+      if (err) {
+        db.detach();
+        return res.status(500).send("Query failed: " + err.message);
+      }
+
+      if (result.length === 0) {
+        return res.json({ con: false, msg: "No Data" });
+      }
+
+      res.json({
+        con: true,
+        msg: result,
+      });
+      db.detach();
+    });
+  });
 });
 
 app.listen(process.env.PORT, () => {
