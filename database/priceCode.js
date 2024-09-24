@@ -146,6 +146,30 @@ let find = (id) => {
   });
 };
 
+let findid = (id) => {
+  return new Promise((resolve, reject) => {
+    PriceCodes.aggregate([
+      {
+        $match: { pricecode_id: pricecode_id },
+      },
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role_id",
+          foreignField: "role_id",
+          as: "role",
+        },
+      },
+      {
+        $unwind: "$role",
+      },
+    ]).exec((err, data) => {
+      if (err) reject(err);
+      resolve(data[0]);
+    });
+  });
+};
+
 let destory = (id) => {
   return new Promise((resolve, reject) => {
     PriceCodes.deleteOne({ pricecode_id: id }, (err, daa) => {
@@ -160,6 +184,7 @@ module.exports = {
   save,
   update,
   find,
+  findid,
   destory,
   allU,
 };

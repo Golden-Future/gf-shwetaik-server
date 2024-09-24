@@ -590,6 +590,13 @@ module.exports = () => {
       .catch((error) => res.json(response(error, false)));
   });
 
+  router.post("/superuser/findid/pcode", (req, res) => {
+    let id = req.body.role_id;
+    PriceCode.findid(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
   router.post("/superuser/delete/pcode", (req, res) => {
     let id = req.body.pricecode_id;
     PriceCode.destory(id)
