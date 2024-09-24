@@ -54,11 +54,11 @@ module.exports = () => {
             if (data) {
               let payload = { email: result.email, name: result.name };
               let token = jwt.sign(payload, process.env.SECRET);
-              let data = encrypt.encrypt(JSON.stringify(result));
+              // let data = encrypt.encrypt(JSON.stringify(result));
               res.json({
                 con: true,
                 token: token,
-                data: data,
+                data: result,
                 msg: `Login Successful!`,
               });
             } else {
@@ -89,8 +89,8 @@ module.exports = () => {
         };
         User.save(obj)
           .then((data) => {
-            let dataa = encrypt.encrypt(JSON.stringify(data));
-            res.json({ con: true, data: dataa, msg: `Save` });
+            // let dataa = encrypt.encrypt(JSON.stringify(data));
+            res.json({ con: true, data: data, msg: `Save` });
           })
           .catch((error) =>
             res.json({ con: false, data: error, msg: "User Save Erorr" })
