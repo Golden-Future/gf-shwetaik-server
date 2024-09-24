@@ -150,7 +150,7 @@ let findid = (id) => {
   return new Promise((resolve, reject) => {
     PriceCodes.aggregate([
       {
-        $match: { pricecode_id: pricecode_id },
+        $match: { role_id: role_id },
       },
       {
         $lookup: {
