@@ -148,24 +148,9 @@ let find = (id) => {
 
 let findid = (id) => {
   return new Promise((resolve, reject) => {
-    PriceCodes.aggregate([
-      {
-        $match: { role_id: role_id },
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
+    PriceCodes.findOne({ role_id: id }, (err, data) => {
       if (err) reject(err);
-      resolve(data[0]);
+      resolve(data);
     });
   });
 };
