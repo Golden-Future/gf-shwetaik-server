@@ -26,20 +26,11 @@ module.exports = () => {
   let CC = require("../database/choosingColumn");
   let Ann = require("../database/announcement");
   let List = require("../database/tableList");
-  let encrypt = require("../helper/e2e");
+  let { encrypt, response } = require("../helper/e2e");
+  let PriceCode = require("../database/priceCode");
 
   // ****** USER ******* //
 
-  let response = (data, status) => {
-    let obj = {
-      con: status,
-      data: status == true ? encrypt.encrypt(JSON.stringify(data)) : data,
-      message: status == true ? "Success" : "Unsuccessful",
-      status: status == true ? 200 : 500,
-      length: status == true ? data.length : 0,
-    };
-    return obj;
-  };
   router.get("/superuser/api/v_1/all/user", (req, res) => {
     User.allU()
       .then((result) => res.json(response(result, true)))
@@ -278,7 +269,6 @@ module.exports = () => {
 
   router.get("/superuser/search/systemOption/:roleId", (req, res) => {
     let uid = req.param("roleId");
-    console.log(uid);
     SystemOption.findByUid(Number(uid))
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
@@ -535,6 +525,77 @@ module.exports = () => {
   });
 
   // ****** CC ******* //
+
+  // ****** Price CODE ******* //
+
+  router.get("/superuser/api/v_1/all/pcode", (req, res) => {
+    PriceCode.allU()
+      .then((result) => {
+        res.json(response(result, true));
+      })
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.get("/superuser/all/pcode", (req, res) => {
+    PriceCode.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/pcode", (req, res) => {
+    let obj = {
+      one: req.body.one,
+      two: req.body.two,
+      three: req.body.three,
+      four: req.body.four,
+      five: req.body.five,
+      six: req.body.six,
+      seven: req.body.seven,
+      eight: req.body.eight,
+      nine: req.body.nine,
+      ten: req.body.ten,
+      active: req.body.active,
+      role_id: req.body.role_id,
+    };
+    PriceCode.save(obj)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/pcode", (req, res) => {
+    let obj = {
+      one: req.body.one,
+      two: req.body.two,
+      three: req.body.three,
+      four: req.body.four,
+      five: req.body.five,
+      six: req.body.six,
+      seven: req.body.seven,
+      eight: req.body.eight,
+      nine: req.body.nine,
+      ten: req.body.ten,
+      active: req.body.active,
+      role_id: req.body.role_id,
+      pricecode_id: req.body.pricecode_id,
+    };
+    PriceCode.update(obj)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/pcode", (req, res) => {
+    let id = req.body.pricecode_id;
+    PriceCode.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/pcode", (req, res) => {
+    let id = req.body.pricecode_id;
+    PriceCode.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
 
   return router;
 };

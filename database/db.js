@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 let paginate = require("mongoose-paginate");
 let url = "mongodb://127.0.0.1:27017/shweTaikInternational";
-mongoose.connect(url, { useNewUrlParser: true })
-    .then(() => console.log("Connected to database"))
-    .catch((err) => console.log(err));
+mongoose
+  .connect(url, { useNewUrlParser: true })
+  .then(() => console.log("Connected to database"))
+  .catch((err) => console.log(err));
 let autoI = require("simple-mongoose-autoincrement");
 let Schema = mongoose.Schema;
 
@@ -11,10 +12,26 @@ let UserScheme = new Schema({
   phone: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String },
-  role_id: { type: Number},
+  role_id: { type: Number },
   name: { type: String },
   userName: { type: String },
   lang: { type: String },
+  since: { type: Date, required: true },
+});
+
+let PriceCodeScheme = new Schema({
+  one: { type: String },
+  two: { type: String },
+  three: { type: String },
+  four: { type: String },
+  five: { type: String },
+  six: { type: String },
+  seven: { type: String },
+  eight: { type: String },
+  nine: { type: String },
+  ten: { type: String },
+  role_id: { type: Number },
+  active: { type: Boolean },
   since: { type: Date, required: true },
 });
 
@@ -51,7 +68,7 @@ let ColorScheme = new Schema({
 let TableListScheme = new Schema({
   list: { type: String },
   role_id: { type: Number },
-  since: { type: Date }
+  since: { type: Date },
 });
 
 let TableScheme = new Schema({
@@ -68,7 +85,6 @@ let choosingColumnScheme = new Schema({
   since: { type: Date },
 });
 
-
 let announcementScheme = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -79,6 +95,10 @@ let announcementScheme = new Schema({
 UserScheme.plugin(autoI, { field: "user_id" });
 UserScheme.plugin(paginate);
 let User = mongoose.model("Users", UserScheme);
+
+PriceCodeScheme.plugin(autoI, { field: "pricecode_id" });
+PriceCodeScheme.plugin(paginate);
+let PriceCodes = mongoose.model("PriceCodes", PriceCodeScheme);
 
 TableListScheme.plugin(autoI, { field: "tableList_id" });
 TableListScheme.plugin(paginate);
@@ -121,5 +141,6 @@ module.exports = {
   Announcement,
   ChoosingColumn,
   Color,
-  tableList
+  tableList,
+  PriceCodes,
 };

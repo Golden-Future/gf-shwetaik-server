@@ -8,7 +8,7 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("./database/user");
 const cors = require("cors");
 const firebird = require("node-firebird");
-
+let encrypt = require("./helper/e2e");
 const app = express();
 
 const jwtOption = {};
