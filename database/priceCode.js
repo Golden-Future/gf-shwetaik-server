@@ -82,7 +82,8 @@ let update = (obj) => {
           obj.eight == null || obj.eight == undefined ? data.eight : obj.eight;
         data.five =
           obj.nine == null || obj.nine == undefined ? data.nine : obj.nine;
-        data.ten = obj.ten == null || obj.ten == undefined ? data.ten : obj.ten;
+        data.zero =
+          obj.zero == null || obj.zero == undefined ? data.zero : obj.zero;
         data.role_id =
           obj.role_id == null || obj.role_id == undefined
             ? data.role_id

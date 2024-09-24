@@ -553,7 +553,7 @@ module.exports = () => {
       seven: req.body.seven,
       eight: req.body.eight,
       nine: req.body.nine,
-      ten: req.body.ten,
+      zero: req.body.zero,
       active: req.body.active,
       role_id: req.body.role_id,
     };
@@ -573,7 +573,7 @@ module.exports = () => {
       seven: req.body.seven,
       eight: req.body.eight,
       nine: req.body.nine,
-      ten: req.body.ten,
+      zero: req.body.zero,
       active: req.body.active,
       role_id: req.body.role_id,
       pricecode_id: req.body.pricecode_id,

@@ -29,7 +29,7 @@ let PriceCodeScheme = new Schema({
   seven: { type: String },
   eight: { type: String },
   nine: { type: String },
-  ten: { type: String },
+  zero: { type: String },
   role_id: { type: Number },
   active: { type: Boolean },
   since: { type: Date, required: true },
