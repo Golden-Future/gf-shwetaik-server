@@ -10,6 +10,9 @@ let Schema = mongoose.Schema;
 
 let UserScheme = new Schema({
   phone: { type: String },
+  phone1: { type: String },
+  address: { type: String },
+  address1: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String },
   role_id: { type: Number },
@@ -17,6 +20,23 @@ let UserScheme = new Schema({
   userName: { type: String },
   lang: { type: String },
   since: { type: Date, required: true },
+});
+
+let LOCAL_IVScheme = new Schema({
+  seller_id: { type: Number },
+  type: { type: String },
+  customer_id: { type: Number },
+  since: { type: Date },
+});
+
+let IV_GoodScheme = new Schema({
+  localIV_id: { type: Number },
+  code: { type: String },
+  description: { type: String },
+  price: { type: Number },
+  location: { type: String },
+  quantity: { type: Number },
+  since: { type: Date },
 });
 
 let PriceCodeScheme = new Schema({
@@ -92,6 +112,37 @@ let announcementScheme = new Schema({
   since: { type: Date },
 });
 
+let ST_AVAscheme = new Schema({
+  code: { type: String },
+  quantity: { type: Number },
+  seller_id: { type: Number },
+  location: { type: String },
+  status: { type: Boolean },
+  since: { type: Date },
+});
+
+let P_IVScheme = new Schema({
+  localIV_id: { type: Number },
+  sun: { type: Number },
+  since: { type: Date },
+});
+
+P_IVScheme.plugin(autoI, { field: "PIV_id" });
+P_IVScheme.plugin(paginate);
+let P_IV = mongoose.model("PIvs", P_IVScheme);
+
+ST_AVAscheme.plugin(autoI, { field: "STAVA_id" });
+ST_AVAscheme.plugin(paginate);
+let ST_AVA = mongoose.model("STAVAs", ST_AVAscheme);
+
+IV_GoodScheme.plugin(autoI, { field: "ivGood_id" });
+IV_GoodScheme.plugin(paginate);
+let IV_Good = mongoose.model("IvGoods", IV_GoodScheme);
+
+LOCAL_IVScheme.plugin(autoI, { field: "localIV_id" });
+LOCAL_IVScheme.plugin(paginate);
+let IV_LOCAL = mongoose.model("LocalIVs", LOCAL_IVScheme);
+
 UserScheme.plugin(autoI, { field: "user_id" });
 UserScheme.plugin(paginate);
 let User = mongoose.model("Users", UserScheme);
@@ -143,4 +194,8 @@ module.exports = {
   Color,
   tableList,
   PriceCodes,
+  IV_Good,
+  IV_LOCAL,
+  ST_AVA,
+  P_IV,
 };
