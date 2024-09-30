@@ -73,6 +73,25 @@ const factory = {
   },
 };
 
+app.get("/table/ss/:name", (req, res) => {
+  let name = req.param("name");
+  firebird.attach(options, function (err, db) {
+    if (err) {
+      return res.status(500).send("Database connection failed: " + err.message);
+    }
+
+    db.query(`SELECT * FROM ${name}`, function (err, result) {
+      if (err) {
+        db.detach();
+        return res.status(500).send("Query failed: " + err.message);
+      }
+
+      res.json(result);
+      db.detach();
+    });
+  });
+});
+
 const pool = genericPool.createPool(factory, {
   max: 10, // Maximum number of connections in the pool
   min: 2, // Minimum number of connections in the pool
@@ -102,25 +121,6 @@ const pool = genericPool.createPool(factory, {
 //     }`;
 
 //     db.query(query, function (err, result) {
-//       if (err) {
-//         db.detach();
-//         return res.status(500).send("Query failed: " + err.message);
-//       }
-
-//       res.json(result);
-//       db.detach();
-//     });
-//   });
-// });
-
-// app.get("/table/ss/:name", (req, res) => {
-//   let name = req.param("name");
-//   firebird.attach(options, function (err, db) {
-//     if (err) {
-//       return res.status(500).send("Database connection failed: " + err.message);
-//     }
-
-//     db.query(`SELECT * FROM ${name}`, function (err, result) {
 //       if (err) {
 //         db.detach();
 //         return res.status(500).send("Query failed: " + err.message);
@@ -204,26 +204,26 @@ app.get("/table/:name/:page/:size", (req, res) => {
 });
 
 // API to fetch all rows from a table
-app.get("/table/ss/:name", (req, res) => {
-  const name = req.param("name");
+// app.get("/table/ss/:name", (req, res) => {
+//   const name = req.param("name");
 
-  pool
-    .acquire()
-    .then((db) => {
-      db.query(`SELECT * FROM ${name}`, (err, result) => {
-        pool.release(db); // Return connection to the pool
+//   pool
+//     .acquire()
+//     .then((db) => {
+//       db.query(`SELECT * FROM ${name}`, (err, result) => {
+//         pool.release(db); // Return connection to the pool
 
-        if (err) {
-          return res.status(500).send("Query failed: " + err.message);
-        }
+//         if (err) {
+//           return res.status(500).send("Query failed: " + err.message);
+//         }
 
-        res.json(result);
-      });
-    })
-    .catch((err) => {
-      res.status(500).send("Database connection failed: " + err.message);
-    });
-});
+//         res.json(result);
+//       });
+//     })
+//     .catch((err) => {
+//       res.status(500).send("Database connection failed: " + err.message);
+//     });
+// });
 
 // API to find a record by unique key
 app.post("/table/find", (req, res) => {
