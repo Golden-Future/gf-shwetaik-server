@@ -10,6 +10,7 @@ const cors = require("cors");
 const firebird = require("node-firebird");
 let encrypt = require("./helper/e2e");
 const app = express();
+const genericPool = require("generic-pool");
 
 const jwtOption = {};
 jwtOption.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
@@ -51,6 +52,122 @@ options.retryConnectionInterval = 1000;
 options.blobAsText = false;
 options.encoding = "UTF8";
 
+// Create a connection pool
+const factory = {
+  create: () => {
+    return new Promise((resolve, reject) => {
+      firebird.attach(options, (err, db) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(db);
+      });
+    });
+  },
+  destroy: (db) => {
+    return new Promise((resolve) => {
+      db.detach(() => {
+        resolve();
+      });
+    });
+  },
+};
+
+const pool = genericPool.createPool(factory, {
+  max: 10, // Maximum number of connections in the pool
+  min: 2, // Minimum number of connections in the pool
+  idleTimeoutMillis: 30000, // Idle time before releasing the connection
+});
+
+// app.get("/table/:name/:page/:size", (req, res) => {
+//   const name = req.params.name;
+//   let page = parseInt(req.params.page, 10);
+//   let size = parseInt(req.params.size, 10);
+
+//   // Validate page and size
+//   if (isNaN(page) || isNaN(size) || page < 1 || size < 1) {
+//     return res.status(400).send("Invalid page or size parameter.");
+//   }
+
+//   const offset = (page - 1) * size;
+//   const limit = size;
+
+//   firebird.attach(options, function (err, db) {
+//     if (err) {
+//       return res.status(500).send("Database connection failed: " + err.message);
+//     }
+
+//     const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${
+//       offset + limit
+//     }`;
+
+//     db.query(query, function (err, result) {
+//       if (err) {
+//         db.detach();
+//         return res.status(500).send("Query failed: " + err.message);
+//       }
+
+//       res.json(result);
+//       db.detach();
+//     });
+//   });
+// });
+
+// app.get("/table/ss/:name", (req, res) => {
+//   let name = req.param("name");
+//   firebird.attach(options, function (err, db) {
+//     if (err) {
+//       return res.status(500).send("Database connection failed: " + err.message);
+//     }
+
+//     db.query(`SELECT * FROM ${name}`, function (err, result) {
+//       if (err) {
+//         db.detach();
+//         return res.status(500).send("Query failed: " + err.message);
+//       }
+
+//       res.json(result);
+//       db.detach();
+//     });
+//   });
+// });
+
+// app.post("/table/find", (req, res) => {
+//   const { tableName, uniquekey, data } = req.body;
+
+//   if (!tableName || !uniquekey || !data) {
+//     return res
+//       .status(400)
+//       .send("Table name, unique key, and data are required.");
+//   }
+
+//   firebird.attach(options, function (err, db) {
+//     if (err) {
+//       return res.status(500).send("Database connection failed: " + err.message);
+//     }
+
+//     const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
+
+//     db.query(query, [data], function (err, result) {
+//       if (err) {
+//         db.detach();
+//         return res.status(500).send("Query failed: " + err.message);
+//       }
+
+//       if (result.length === 0) {
+//         return res.json({ con: false, msg: "No Data" });
+//       }
+
+//       res.json({
+//         con: true,
+//         msg: result,
+//       });
+//       db.detach();
+//     });
+//   });
+// });
+
+// API to fetch table data with pagination
 app.get("/table/:name/:page/:size", (req, res) => {
   const name = req.params.name;
   let page = parseInt(req.params.page, 10);
@@ -64,46 +181,51 @@ app.get("/table/:name/:page/:size", (req, res) => {
   const offset = (page - 1) * size;
   const limit = size;
 
-  firebird.attach(options, function (err, db) {
-    if (err) {
-      return res.status(500).send("Database connection failed: " + err.message);
-    }
+  pool
+    .acquire()
+    .then((db) => {
+      const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${
+        offset + limit
+      }`;
 
-    const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${
-      offset + limit
-    }`;
+      db.query(query, (err, result) => {
+        pool.release(db); // Return connection to the pool
 
-    db.query(query, function (err, result) {
-      if (err) {
-        db.detach();
-        return res.status(500).send("Query failed: " + err.message);
-      }
+        if (err) {
+          return res.status(500).send("Query failed: " + err.message);
+        }
 
-      res.json(result);
-      db.detach();
+        res.json(result);
+      });
+    })
+    .catch((err) => {
+      res.status(500).send("Database connection failed: " + err.message);
     });
-  });
 });
 
+// API to fetch all rows from a table
 app.get("/table/ss/:name", (req, res) => {
-  let name = req.param("name");
-  firebird.attach(options, function (err, db) {
-    if (err) {
-      return res.status(500).send("Database connection failed: " + err.message);
-    }
+  const name = req.param("name");
 
-    db.query(`SELECT * FROM ${name}`, function (err, result) {
-      if (err) {
-        db.detach();
-        return res.status(500).send("Query failed: " + err.message);
-      }
+  pool
+    .acquire()
+    .then((db) => {
+      db.query(`SELECT * FROM ${name}`, (err, result) => {
+        pool.release(db); // Return connection to the pool
 
-      res.json(result);
-      db.detach();
+        if (err) {
+          return res.status(500).send("Query failed: " + err.message);
+        }
+
+        res.json(result);
+      });
+    })
+    .catch((err) => {
+      res.status(500).send("Database connection failed: " + err.message);
     });
-  });
 });
 
+// API to find a record by unique key
 app.post("/table/find", (req, res) => {
   const { tableName, uniquekey, data } = req.body;
 
@@ -113,30 +235,31 @@ app.post("/table/find", (req, res) => {
       .send("Table name, unique key, and data are required.");
   }
 
-  firebird.attach(options, function (err, db) {
-    if (err) {
-      return res.status(500).send("Database connection failed: " + err.message);
-    }
+  pool
+    .acquire()
+    .then((db) => {
+      const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
 
-    const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
+      db.query(query, [data], (err, result) => {
+        pool.release(db); // Return connection to the pool
 
-    db.query(query, [data], function (err, result) {
-      if (err) {
-        db.detach();
-        return res.status(500).send("Query failed: " + err.message);
-      }
+        if (err) {
+          return res.status(500).send("Query failed: " + err.message);
+        }
 
-      if (result.length === 0) {
-        return res.json({ con: false, msg: "No Data" });
-      }
+        if (result.length === 0) {
+          return res.json({ con: false, msg: "No Data" });
+        }
 
-      res.json({
-        con: true,
-        msg: result,
+        res.json({
+          con: true,
+          msg: result,
+        });
       });
-      db.detach();
+    })
+    .catch((err) => {
+      res.status(500).send("Database connection failed: " + err.message);
     });
-  });
 });
 
 app.listen(process.env.PORT, () => {

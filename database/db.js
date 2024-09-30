@@ -123,7 +123,7 @@ let ST_AVAscheme = new Schema({
 
 let P_IVScheme = new Schema({
   localIV_id: { type: Number },
-  sun: { type: Number },
+  sum: { type: Number },
   since: { type: Date },
 });
 
