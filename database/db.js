@@ -127,6 +127,18 @@ let P_IVScheme = new Schema({
   since: { type: Date },
 });
 
+// ST Booking
+
+let ST_UserScheme = new Schema({
+  email: { type: String, required: true },
+  password: { type: String },
+  since: { type: Date },
+});
+
+let ST;
+
+// ST Booking
+
 P_IVScheme.plugin(autoI, { field: "PIV_id" });
 P_IVScheme.plugin(paginate);
 let P_IV = mongoose.model("PIvs", P_IVScheme);
@@ -183,6 +195,14 @@ announcementScheme.plugin(autoI, { field: "announcement_id" });
 announcementScheme.plugin(paginate);
 let Announcement = mongoose.model("Announcement", announcementScheme);
 
+// ST Booking
+
+ST_UserScheme.plugin(autoI, { field: "STUser_id" });
+ST_UserScheme.plugin(paginate);
+let ST_User = mongoose.model("STUsers", ST_UserScheme);
+
+// ST Booking
+
 module.exports = {
   User,
   Role,
@@ -198,4 +218,10 @@ module.exports = {
   IV_LOCAL,
   ST_AVA,
   P_IV,
+
+  // ST Booking
+
+  ST_User,
+
+  // ST Booking
 };
