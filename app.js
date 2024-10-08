@@ -94,6 +94,34 @@ app.get("/table/ss/:name", (req, res) => {
   });
 });
 
+app.post("/table/filter", (req, res) => {
+  let name = req.body.name;
+  let codes = req.body.codes.split(",").map(Number);
+
+  let whereClause = codes
+    .map((code) => `itemcode LIKE '${code}-%'`)
+    .join(" OR ");
+
+  firebird.attach(options, function (err, db) {
+    if (err) {
+      return res.status(500).send("Database connection failed: " + err.message);
+    }
+
+    db.query(
+      `SELECT * FROM ${name} WHERE ${whereClause}`,
+      function (err, result) {
+        if (err) {
+          db.detach();
+          return res.status(500).send("Query failed: " + err.message);
+        }
+
+        res.json(result);
+        db.detach();
+      }
+    );
+  });
+});
+
 const pool = genericPool.createPool(factory, {
   max: 10, // Maximum number of connections in the pool
   min: 2, // Minimum number of connections in the pool
