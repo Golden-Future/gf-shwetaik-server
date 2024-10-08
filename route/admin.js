@@ -624,7 +624,7 @@ module.exports = () => {
   });
 
   router.post("/superuser/find/productCode", (req, res) => {
-    let id = req.body.Product_Code_id;
+    let id = req.body.role_id;
     Product_Code.find(id)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));

@@ -133,7 +133,7 @@ let find = (id) => {
   return new Promise((resolve, reject) => {
     Product_Code.aggregate([
       {
-        $match: { Product_Code_id: id },
+        $match: { role_id: id },
       },
       {
         $lookup: {
