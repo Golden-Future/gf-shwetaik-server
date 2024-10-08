@@ -96,7 +96,7 @@ app.get("/table/ss/:name", (req, res) => {
 
 app.post("/table/filter", (req, res) => {
   let name = req.body.name;
-  let codes = req.body.codes.split(",").map(Number);
+  let codes = req.body.codes;
 
   let whereClause = codes
     .map((code) => `itemcode LIKE '${code}-%'`)
