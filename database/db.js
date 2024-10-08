@@ -35,7 +35,26 @@ let Product_CodeScheme = new Schema({
     DESCRIPTION: { type: String },
   },
   QTY: { type: Number },
+  since: { type: Date },
+});
+
+let TeamCodeScheme = new Schema({
+  code: { type: String },
   role_id: { type: Number },
+  since: { type: Date },
+});
+
+let TransferScheme = new Schema({
+  productCode: { type: String },
+  qty: { type: Number },
+  req_id: { type: Number },
+  req_location: { type: String },
+  res_id: { type: Number },
+  res_location: { type: String },
+  status: { type: Boolean },
+  description: { type: String },
+  type: { type: String },
+  insert_status: { type: Boolean },
   since: { type: Date },
 });
 
@@ -153,6 +172,14 @@ let MV_Moviescheme = new Schema({
   since: { type: Date },
 });
 
+TransferScheme.plugin(autoI, { field: "Transfer_id" });
+TransferScheme.plugin(paginate);
+let Transfers = mongoose.model("Transfers", TransferScheme);
+
+TeamCodeScheme.plugin(autoI, { field: "TeamCode_id" });
+TeamCodeScheme.plugin(paginate);
+let TeamCode = mongoose.model("TeamCodes", TeamCodeScheme);
+
 Product_CodeScheme.plugin(autoI, { field: "Product_Code_id" });
 Product_CodeScheme.plugin(paginate);
 let Product_Code = mongoose.model("Product_Codes", Product_CodeScheme);
@@ -239,4 +266,6 @@ module.exports = {
   Product_Code,
   MV_Movie,
   MV_User,
+  TeamCode,
+  Transfers,
 };

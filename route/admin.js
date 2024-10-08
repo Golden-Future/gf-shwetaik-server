@@ -23,12 +23,14 @@ module.exports = () => {
   let SystemOption = require("../database/systemOption");
   let Table = require("../database/table");
   let Color = require("../database/color");
+  let Transfer = require("../database/transfer");
   let CC = require("../database/choosingColumn");
   let Ann = require("../database/announcement");
   let List = require("../database/tableList");
   let { encrypt, response } = require("../helper/e2e");
   let PriceCode = require("../database/priceCode");
   let Product_Code = require("../database/productcode");
+  let TeamCode = require("../database/teamcode");
 
   // ****** USER ******* //
 
@@ -633,6 +635,65 @@ module.exports = () => {
   router.post("/superuser/delete/productCode", (req, res) => {
     let id = req.body.Product_Code_id;
     Product_Code.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.get("/superuser/all/teamCode", (req, res) => {
+    TeamCode.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/teamCode", (req, res) => {
+    TeamCode.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/teamCode", (req, res) => {
+    TeamCode.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/teamCode", (req, res) => {
+    let id = req.body.role_id;
+    TeamCode.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/teamCode", (req, res) => {
+    let id = req.body.TeamCode_id;
+    TeamCode.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.get("/superuser/all/transfer", (req, res) => {
+    Transfer.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/transfer", (req, res) => {
+    Transfer.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/transfer", (req, res) => {
+    let id = req.body.role_id;
+    let status = req.body.status;
+    Transfer.find(id, status)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/transfer", (req, res) => {
+    let id = req.body.Transfer_id;
+    Transfer.destory(id)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
