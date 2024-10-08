@@ -131,24 +131,9 @@ let update = (obj) => {
 
 let find = (id) => {
   return new Promise((resolve, reject) => {
-    Product_Code.aggregate([
-      {
-        $match: { role_id: id },
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
+    Product_Code.find({ role_id: id }, (err, data) => {
       if (err) reject(err);
-      resolve(data[0]);
+      resolve(data);
     });
   });
 };
