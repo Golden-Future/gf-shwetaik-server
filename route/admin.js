@@ -624,14 +624,14 @@ module.exports = () => {
   });
 
   router.post("/superuser/find/productCode", (req, res) => {
-    let id = req.body.pricecode_id;
+    let id = req.body.Product_Code_id;
     Product_Code.find(id)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/productCode", (req, res) => {
-    let id = req.body.pricecode_id;
+    let id = req.body.Product_Code_id;
     Product_Code.destory(id)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
