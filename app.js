@@ -8,7 +8,7 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("./database/user");
 const cors = require("cors");
 const firebird = require("node-firebird");
-let encrypt = require("./helper/e2e");
+// let encrypt = require("./helper/e2e");
 const app = express();
 const genericPool = require("generic-pool");
 
@@ -36,7 +36,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 const adminRoute = require("./route/admin")(express, jwt, passport, bodyParser);
+const movieRoute = require("./route/movie")(express);
 app.use("/admin", adminRoute);
+app.use("/movie", movieRoute);
 
 var options = {};
 

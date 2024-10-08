@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 let paginate = require("mongoose-paginate");
 let url = "mongodb://127.0.0.1:27017/shweTaikInternational";
-mongoose
-  .connect(url, { useNewUrlParser: true })
-  .then(() => console.log("Connected to database"))
-  .catch((err) => console.log(err));
+mongoose.connect(url, { useNewUrlParser: true });
+// .then(() => console.log("Connected to database"))
+// .catch((err) => console.log(err));
 let autoI = require("simple-mongoose-autoincrement");
 let Schema = mongoose.Schema;
 
@@ -26,6 +25,17 @@ let LOCAL_IVScheme = new Schema({
   seller_id: { type: Number },
   type: { type: String },
   customer_id: { type: Number },
+  since: { type: Date },
+});
+
+let Product_CodeScheme = new Schema({
+  code: { type: String },
+  location: {
+    CODE: { type: String },
+    DESCRIPTION: { type: String },
+  },
+  QTY: { type: Number },
+  role_id: { type: Number },
   since: { type: Date },
 });
 
@@ -127,6 +137,34 @@ let P_IVScheme = new Schema({
   since: { type: Date },
 });
 
+let MV_Userscheme = new Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String },
+  type: { type: String },
+  since: { type: Date, required: true },
+});
+
+let MV_Moviescheme = new Schema({
+  photo: { type: String },
+  coverphoto: { type: String },
+  title: { type: String },
+  description: { type: String },
+  tmdbID: { type: Number },
+  since: { type: Date },
+});
+
+Product_CodeScheme.plugin(autoI, { field: "Product_Code_id" });
+Product_CodeScheme.plugin(paginate);
+let Product_Code = mongoose.model("Product_Codes", Product_CodeScheme);
+
+MV_Userscheme.plugin(autoI, { field: "MV_User_id" });
+MV_Userscheme.plugin(paginate);
+let MV_User = mongoose.model("MV_Users", MV_Userscheme);
+
+MV_Moviescheme.plugin(autoI, { field: "MV_Movie_id" });
+MV_Moviescheme.plugin(paginate);
+let MV_Movie = mongoose.model("MV_Movies", MV_Moviescheme);
+
 P_IVScheme.plugin(autoI, { field: "PIV_id" });
 P_IVScheme.plugin(paginate);
 let P_IV = mongoose.model("PIvs", P_IVScheme);
@@ -198,4 +236,7 @@ module.exports = {
   IV_LOCAL,
   ST_AVA,
   P_IV,
+  Product_Code,
+  MV_Movie,
+  MV_User,
 };

@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Shwe Taik International",
   "main": "app.js",
-  "scripts": {
-    "dev": "node --watch app.js"
-  },
   "keywords": [
     "shwe-taik"
   ],

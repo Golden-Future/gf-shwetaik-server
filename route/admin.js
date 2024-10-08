@@ -28,6 +28,7 @@ module.exports = () => {
   let List = require("../database/tableList");
   let { encrypt, response } = require("../helper/e2e");
   let PriceCode = require("../database/priceCode");
+  let Product_Code = require("../database/productcode");
 
   // ****** USER ******* //
 
@@ -600,6 +601,38 @@ module.exports = () => {
   router.post("/superuser/delete/pcode", (req, res) => {
     let id = req.body.pricecode_id;
     PriceCode.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.get("/superuser/all/productCode", (req, res) => {
+    Product_Code.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/productCode", (req, res) => {
+    Product_Code.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/productCode", (req, res) => {
+    Product_Code.update(obj)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/productCode", (req, res) => {
+    let id = req.body.pricecode_id;
+    Product_Code.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/productCode", (req, res) => {
+    let id = req.body.pricecode_id;
+    Product_Code.destory(id)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
