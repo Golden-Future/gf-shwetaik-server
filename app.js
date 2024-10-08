@@ -99,7 +99,7 @@ app.post("/table/filter", (req, res) => {
   let codes = req.body.codes;
 
   let whereClause = codes
-    .map((code) => `itemcode LIKE '${code}-%'`)
+    .map((code) => `ITEMCODE LIKE '${code}-%'`)
     .join(" OR ");
 
   firebird.attach(options, function (err, db) {
