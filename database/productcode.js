@@ -80,5 +80,4 @@ module.exports = {
   update,
   find,
   destory,
-  allU,
 };
