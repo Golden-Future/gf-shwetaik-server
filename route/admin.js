@@ -193,6 +193,12 @@ module.exports = () => {
       .catch((error) => res.json(response(error, false)));
   });
 
+  router.post("/superuser/all/roletype", (req, res) => {
+    Role.findType(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
   router.post("/superuser/save/role", (req, res) => {
     let obj = {
       roleName: req.body.roleName,

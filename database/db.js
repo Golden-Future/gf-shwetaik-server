@@ -108,6 +108,7 @@ let LanguageScheme = new Schema({
 
 let RoleScheme = new Schema({
   roleName: { type: String },
+  type: { type: String },
   since: { type: Date, required: true },
 });
 
