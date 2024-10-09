@@ -75,8 +75,34 @@ module.exports = () => {
       .catch((erro) => res.json({ con: false, data: erro, msg: `Error` }));
   });
 
+  router.post("/superuser/changePass", (req, res) => {
+    bcrypt
+      .encrypt(req.body.password)
+      .then((result) => {
+        let obj = {
+          user_id: req.body.user_id,
+          password: result,
+        };
+        User.update(obj)
+          .then((result) => res.json(response(result, true)))
+          .catch((error) => res.json(response(error, false)));
+      })
+      .catch((eee) =>
+        res.json({ con: false, data: eee, msg: `Encrypt Error` })
+      );
+  });
+
   router.post("/superuser/register/user", (req, res) => {
-    const { phone, email, password, role_id: role, name, lang } = req.body;
+    const {
+      phone,
+      email,
+      password,
+      role_id: role,
+      name,
+      lang,
+      photo,
+      type,
+    } = req.body;
     const userName = unique_username.generateUsername("", 3, 20);
     bcrypt
       .encrypt(password)
@@ -87,6 +113,8 @@ module.exports = () => {
           password: result,
           role_id: role,
           name: name,
+          photo: photo,
+          type: type,
           userName: userName,
           lang: lang,
         };
@@ -105,17 +133,7 @@ module.exports = () => {
   });
 
   router.post("/superuser/update/user", (req, res) => {
-    let obj = {
-      phone: req.body.phone,
-      email: req.body.email,
-      role_id: req.body.role_id,
-      name: req.body.name,
-      userName: req.body.userName,
-      user_id: req.body.user_id,
-      lang: req.body.lang,
-      password: req.body.password,
-    };
-    User.update(obj)
+    User.update(req.body)
       .then((result) => res.json(response(result, true)))
       .catch((error) => {
         if (error.code == 1100) {
