@@ -17,6 +17,8 @@ let UserScheme = new Schema({
   role_id: { type: Number },
   name: { type: String },
   userName: { type: String },
+  type: { type: String },
+  photo: { type: String },
   lang: { type: String },
   since: { type: Date, required: true },
 });
@@ -170,6 +172,27 @@ let MV_Moviescheme = new Schema({
   description: { type: String },
   tmdbID: { type: Number },
   since: { type: Date },
+});
+
+let ShopScheme = new Schema({
+  name: { type: String },
+  logo: { type: String },
+  phone: { type: String },
+  phone1: { type: String },
+  email: { type: String },
+  email1: { type: String },
+  address: { type: String },
+  since: { type: Date },
+});
+
+let categoryScheme = new Schema({
+  name: { type: String },
+  since: { type: Date },
+});
+
+let itemScheme = new Schema({
+  photo: { type: String },
+  name: { type: String },
 });
 
 TransferScheme.plugin(autoI, { field: "Transfer_id" });
