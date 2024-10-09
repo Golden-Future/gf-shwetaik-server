@@ -1,19 +1,47 @@
 let db = require("./db");
 let User = db.User;
 
-
-let allU = ()=>{
-	return new Promise((resolve,reject)=>{
-	User.find({},(err,d)=>{
-	if(err) reject(err);
-	resolve(d);
-})
-})
+let allU = () => {
+  return new Promise((resolve, reject) => {
+    User.find({}, (err, d) => {
+      if (err) reject(err);
+      resolve(d);
+    });
+  });
 };
 
 let all = () => {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    User.aggregate([
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role_id",
+          foreignField: "role_id",
+          as: "role",
+        },
+      },
+      {
+        $unwind: "$role",
+      },
+    ]).exec((err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
+  });
+};
+
+let save = (obj) => {
+  return new Promise((resolve, reject) => {
+    obj["since"] = new Date();
+    let user = new User(obj);
+    user.save((err, savedUser) => {
+      if (err) return reject(err);
+
       User.aggregate([
+        {
+          $match: { user_id: savedUser.user_id },
+        },
         {
           $lookup: {
             from: "roles",
@@ -25,45 +53,14 @@ let all = () => {
         {
           $unwind: "$role",
         },
-      ])
-      .exec((err, data) => {
-        if (err) reject(err);
-        resolve(data);
+      ]).exec((aggErr, data) => {
+        if (aggErr) return reject(aggErr);
+        resolve(data[0]);
       });
     });
-  };
+  });
+};
 
-  let save = (obj) => {
-    return new Promise((resolve, reject) => {
-      obj["since"] = new Date();
-      let user = new User(obj);
-      user.save((err, savedUser) => {
-        if (err) return reject(err);
-  
-        User.aggregate([
-          {
-            $match: { user_id: savedUser.user_id } 
-          },
-          {
-            $lookup: {
-              from: "roles", 
-              localField: "role_id",
-              foreignField: "role_id",
-              as: "role", 
-            },
-          },
-          {
-            $unwind: "$role" 
-          }
-        ])
-        .exec((aggErr, data) => {
-          if (aggErr) return reject(aggErr);
-          resolve(data[0]); 
-        });
-      });
-    });
-  };
-  
 let update = (obj) => {
   return new Promise((resolve, reject) => {
     User.findOne({ user_id: obj.user_id }, (err, data) => {
@@ -79,17 +76,21 @@ let update = (obj) => {
             ? data.password
             : obj.password;
         data.role_id =
-          obj.role_id == null || obj.role_id == undefined ? data.role_id : obj.role_id;
+          obj.role_id == null || obj.role_id == undefined
+            ? data.role_id
+            : obj.role_id;
         data.name =
           obj.name == null || obj.name == undefined ? data.name : obj.name;
+        data.type =
+          obj.type == null || obj.type == undefined ? data.type : obj.type;
+        data.photo =
+          obj.photo == null || obj.photo == undefined ? data.photo : obj.photo;
         data.userName =
           obj.userName == null || obj.userName == undefined
             ? data.userName
             : obj.userName;
         data.lang =
-          obj.lang == null || obj.lang == undefined
-            ? data.lang
-            : obj.lang;
+          obj.lang == null || obj.lang == undefined ? data.lang : obj.lang;
         data.since = new Date();
         data.save((error, datas) => {
           if (error) {
@@ -97,23 +98,23 @@ let update = (obj) => {
           } else {
             User.aggregate([
               {
-                $match: { user_id: datas.user_id}
+                $match: { user_id: datas.user_id },
               },
               {
                 $lookup: {
                   from: "roles",
                   localField: "role_id",
                   foreignField: "role_id",
-                  as: "role"
-                }
+                  as: "role",
+                },
               },
               {
-                $unwind: "$role"
-              }
+                $unwind: "$role",
+              },
             ]).exec((e, d) => {
               if (e) reject(e);
               resolve(d);
-            })
+            });
           }
         });
       }
@@ -125,7 +126,7 @@ let find = (id) => {
   return new Promise((resolve, reject) => {
     User.aggregate([
       {
-        $match: { user_id: id }
+        $match: { user_id: id },
       },
       {
         $lookup: {
@@ -136,12 +137,11 @@ let find = (id) => {
         },
       },
       {
-        $unwind: "$role" 
-      }
-    ])
-    .exec((err, data) => {
+        $unwind: "$role",
+      },
+    ]).exec((err, data) => {
       if (err) reject(err);
-      resolve(data[0]); 
+      resolve(data[0]);
     });
   });
 };
@@ -150,7 +150,7 @@ let findEmail = (email) => {
   return new Promise((resolve, reject) => {
     User.aggregate([
       {
-        $match: { email: email }
+        $match: { email: email },
       },
       {
         $lookup: {
@@ -161,12 +161,11 @@ let findEmail = (email) => {
         },
       },
       {
-        $unwind: "$role" 
-      }
-    ])
-    .exec((err, data) => {
+        $unwind: "$role",
+      },
+    ]).exec((err, data) => {
       if (err) reject(err);
-      resolve(data[0]); 
+      resolve(data[0]);
     });
   });
 };
@@ -187,5 +186,5 @@ module.exports = {
   find,
   findEmail,
   destory,
-allU
+  allU,
 };
