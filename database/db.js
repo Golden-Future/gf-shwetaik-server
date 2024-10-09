@@ -195,6 +195,8 @@ let itemScheme = new Schema({
   name: { type: String },
 });
 
+// Car Rental
+
 let carScheme = new Schema({
   car_no: { type: String },
   type: { type: String },
@@ -223,6 +225,8 @@ let commentScheme = new Schema({
 
 let wayScheme = new Schema({
   from: { type: String },
+  fromDate: { type: Date },
+  toDate: { type: Date },
   to: { type: String },
   title: { type: String },
   description: { type: String },
@@ -230,7 +234,7 @@ let wayScheme = new Schema({
   Driver_id: { type: Number },
   Reporter_id: { type: Number },
   time: {
-    durationn: { type: Number },
+    duration: { type: Number },
     UCT_code: { type: String },
   },
   type: { type: String },
@@ -239,6 +243,8 @@ let wayScheme = new Schema({
   Status_id: { type: Number },
   since: { type: Date },
 });
+
+// Car Rental
 
 statusScheme.plugin(autoI, { field: "Status_id" });
 statusScheme.plugin(paginate);

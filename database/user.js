@@ -122,6 +122,64 @@ let update = (obj) => {
   });
 };
 
+let findType = (type) => {
+  return new Promise((resolve, reject) => {
+    User.find({ type: type }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        data
+          .aggregate([
+            {
+              $lookup: {
+                from: "roles",
+                localField: "role_id",
+                foreignField: "role_id",
+                as: "role",
+              },
+            },
+            {
+              $unwind: "$role",
+            },
+          ])
+          .exec((err, data) => {
+            if (err) reject(err);
+            resolve(data);
+          });
+      }
+    });
+  });
+};
+
+let findRole = (type, role) => {
+  return new Promise((resolve, reject) => {
+    User.find({ type: type, role_id: role }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        data
+          .aggregate([
+            {
+              $lookup: {
+                from: "roles",
+                localField: "role_id",
+                foreignField: "role_id",
+                as: "role",
+              },
+            },
+            {
+              $unwind: "$role",
+            },
+          ])
+          .exec((err, data) => {
+            if (err) reject(err);
+            resolve(data);
+          });
+      }
+    });
+  });
+};
+
 let find = (id) => {
   return new Promise((resolve, reject) => {
     User.aggregate([
@@ -187,4 +245,6 @@ module.exports = {
   findEmail,
   destory,
   allU,
+  findType,
+  findRole,
 };

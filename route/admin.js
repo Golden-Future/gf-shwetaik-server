@@ -31,6 +31,11 @@ module.exports = () => {
   let PriceCode = require("../database/priceCode");
   let Product_Code = require("../database/productcode");
   let TeamCode = require("../database/teamcode");
+  let Car = require("../database/car");
+  let Way = require("../database/way");
+  let Status = require("../database/car_status");
+  let Log = require("../database/log");
+  let Comment = require("../database/comment");
 
   // ****** USER ******* //
 
@@ -158,6 +163,25 @@ module.exports = () => {
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
+
+  // **************** Other System **************
+
+  router.post("/superuser/findType", (req, res) => {
+    let type = req.body.type;
+    User.findType(type)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/findRole", (req, res) => {
+    let type = req.body.type;
+    let role_id = req.body.role_id;
+    User.findRole(type, role_id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  // **************** Other System **************
 
   // ****** USER ******* //
 
@@ -715,6 +739,190 @@ module.exports = () => {
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
+
+  // **************** Car **************
+
+  // **************** car scheme **************
+
+  router.get("/superuser/all/car", (req, res) => {
+    Car.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/car", (req, res) => {
+    Car.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/car", (req, res) => {
+    Car.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/car", (req, res) => {
+    let id = req.body.Car_id;
+    Car.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/car", (req, res) => {
+    let id = req.body.Car_id;
+    Car.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  // ************  car ***************
+
+  // ************  way ***************
+
+  router.get("/superuser/all/way", (req, res) => {
+    Way.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/way", (req, res) => {
+    Way.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/way", (req, res) => {
+    Way.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/way", (req, res) => {
+    let id = req.body.Way_id;
+    Way.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/way", (req, res) => {
+    let id = req.body.Way_id;
+    Way.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  // ************  way ***************
+
+  // ************  status ***************
+
+  router.get("/superuser/all/status", (req, res) => {
+    Status.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/status", (req, res) => {
+    Status.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/status", (req, res) => {
+    Status.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/status", (req, res) => {
+    let id = req.body.Status_id;
+    Status.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/status", (req, res) => {
+    let id = req.body.Status_id;
+    Status.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  // ************  status ***************
+
+  // ************  log ***************
+
+  router.get("/superuser/all/log", (req, res) => {
+    Log.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/log", (req, res) => {
+    Log.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/log", (req, res) => {
+    Log.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/log", (req, res) => {
+    let id = req.body.Log_id;
+    Log.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/log", (req, res) => {
+    let id = req.body.Log_id;
+    Log.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  // ************  log ***************
+
+  // ************  comment ***************
+
+  router.get("/superuser/all/comment", (req, res) => {
+    Comment.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/save/comment", (req, res) => {
+    Comment.save(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/update/comment", (req, res) => {
+    Comment.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/comment", (req, res) => {
+    let id = req.body.Comment_id;
+    Comment.find(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/delete/comment", (req, res) => {
+    let id = req.body.Comment_id;
+    Comment.destory(id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  // ************  comment ***************
+
+  // ************* Car ********************
 
   return router;
 };
