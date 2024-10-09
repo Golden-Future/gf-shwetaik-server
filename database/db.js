@@ -195,6 +195,71 @@ let itemScheme = new Schema({
   name: { type: String },
 });
 
+let carScheme = new Schema({
+  car_no: { type: String },
+  type: { type: String },
+  photo: { type: String },
+  since: { type: Date },
+});
+
+let statusScheme = new Schema({
+  name: { type: String },
+  since: { type: Date },
+});
+
+let logScheme = new Schema({
+  description: { type: String },
+  user_id: { type: Number },
+  Way_id: { type: Number },
+  since: { type: Date },
+});
+
+let commentScheme = new Schema({
+  description: { type: String },
+  user_id: { type: Number },
+  Way_id: { type: Number },
+  since: { type: Date },
+});
+
+let wayScheme = new Schema({
+  from: { type: String },
+  to: { type: String },
+  title: { type: String },
+  description: { type: String },
+  Car_id: { type: Number },
+  Driver_id: { type: Number },
+  Reporter_id: { type: Number },
+  time: {
+    durationn: { type: Number },
+    UCT_code: { type: String },
+  },
+  type: { type: String },
+  price: { type: Number },
+  total: { type: Number },
+  Status_id: { type: Number },
+  since: { type: Date },
+});
+
+statusScheme.plugin(autoI, { field: "Status_id" });
+statusScheme.plugin(paginate);
+let Status = mongoose.model("Status", statusScheme);
+
+logScheme.plugin(autoI, { field: "Log_id" });
+logScheme.plugin(paginate);
+let Logs = mongoose.model("Logs", logScheme);
+
+commentScheme.plugin(autoI, { field: "Comment_id" });
+commentScheme.plugin(paginate);
+let Comments = mongoose.model("Comments", commentScheme);
+
+wayScheme.plugin(autoI, { field: "Way_id" });
+wayScheme.plugin(paginate);
+let Way = mongoose.model("Ways", wayScheme);
+
+carScheme.plugin(autoI, { field: "Car_id" });
+carScheme.plugin(paginate);
+let Car = mongoose.model("Cars", carScheme);
+
 TransferScheme.plugin(autoI, { field: "Transfer_id" });
 TransferScheme.plugin(paginate);
 let Transfers = mongoose.model("Transfers", TransferScheme);
@@ -291,4 +356,9 @@ module.exports = {
   MV_User,
   TeamCode,
   Transfers,
+  Car,
+  Way,
+  Logs,
+  Comments,
+  Status,
 };
