@@ -10,6 +10,7 @@ let Schema = mongoose.Schema;
 let UserScheme = new Schema({
   phone: { type: String },
   phone1: { type: String },
+  notiToken: { type: String },
   address: { type: String },
   address1: { type: String },
   email: { type: String, required: true, unique: true },

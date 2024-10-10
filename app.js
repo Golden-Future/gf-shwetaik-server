@@ -94,10 +94,39 @@ app.get("/table/ss/:name", (req, res) => {
   });
 });
 
-app.post("/table/filter", (req, res) => {
-  let name = req.body.name;
-  let codes = req.body.codes;
+// app.post("/table/filter", (req, res) => {
+//   let name = req.body.name;
+//   let codes = req.body.codes;
 
+//   let whereClause = codes
+//     .map((code) => `ITEMCODE LIKE '${code}-%'`)
+//     .join(" OR ");
+
+//   firebird.attach(options, function (err, db) {
+//     if (err) {
+//       return res.status(500).send("Database connection failed: " + err.message);
+//     }
+
+//     db.query(
+//       `SELECT * FROM ${name} WHERE ${whereClause}`,
+//       function (err, result) {
+//         if (err) {
+//           db.detach();
+//           return res.status(500).send("Query failed: " + err.message);
+//         }
+
+//         res.json(result);
+//         db.detach();
+//       }
+//     );
+//   });
+// });
+
+app.post("/table/filter", (req, res) => {
+  let name = req.body.name; // Name of the main table (e.g., your main table name)
+  let codes = req.body.codes; // List of codes to filter
+
+  // Create the WHERE clause based on the provided codes
   let whereClause = codes
     .map((code) => `ITEMCODE LIKE '${code}-%'`)
     .join(" OR ");
@@ -107,14 +136,20 @@ app.post("/table/filter", (req, res) => {
       return res.status(500).send("Database connection failed: " + err.message);
     }
 
+    // Updated query to join LOCATION table with CODE from ST_LOCATION
     db.query(
-      `SELECT * FROM ${name} WHERE ${whereClause}`,
+      `SELECT c.*, l.CODE AS LOCATION_CODE, l.DESCRIPTION AS LOCATION_DESCRIPTION, 
+              l.ADDRESS1, l.ADDRESS2, l.PROJECT, l.ISACTIVE 
+       FROM ${name} c
+       LEFT JOIN ST_LOCATION l ON c.LOCATION = l.CODE
+       WHERE ${whereClause}`,
       function (err, result) {
         if (err) {
           db.detach();
           return res.status(500).send("Query failed: " + err.message);
         }
 
+        // Send the query result as a JSON response
         res.json(result);
         db.detach();
       }

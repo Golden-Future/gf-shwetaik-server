@@ -45,12 +45,13 @@ let update = (obj) => {
 
 let findType = (type) => {
   return new Promise((resolve, reject) => {
-    Role.find({ type: type }, (err, data) => {
+    Role.findOne({ roleName: type }, (err, data) => {
       if (err) reject(err);
       resolve(data);
     });
   });
 };
+
 let find = (id) => {
   return new Promise((resolve, reject) => {
     Role.findOne({ role_id: id }, (err, data) => {

@@ -71,6 +71,10 @@ let update = (obj) => {
           obj.phone == null || obj.phone == undefined ? data.phone : obj.phone;
         data.email =
           obj.email == null || obj.email == undefined ? data.email : obj.email;
+        data.notiToken =
+          obj.notiToken == null || obj.notiToken == undefined
+            ? data.notiToken
+            : obj.notiToken;
         data.password =
           obj.password == null || obj.password == undefined
             ? data.password
