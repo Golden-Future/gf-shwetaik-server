@@ -202,6 +202,7 @@ module.exports = () => {
   router.post("/superuser/save/role", (req, res) => {
     let obj = {
       roleName: req.body.roleName,
+      type: req.body.type,
     };
     Role.save(obj)
       .then((result) => res.json(response(result, true)))
@@ -211,6 +212,7 @@ module.exports = () => {
   router.post("/superuser/update/role", (req, res) => {
     let obj = {
       roleName: req.body.roleName,
+      type: req.body.type,
       role_id: req.body.role_id,
     };
     Role.update(obj)
