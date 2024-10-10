@@ -124,58 +124,48 @@ let update = (obj) => {
 
 let findType = (type) => {
   return new Promise((resolve, reject) => {
-    User.find({ type: type }, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        data
-          .aggregate([
-            {
-              $lookup: {
-                from: "roles",
-                localField: "role_id",
-                foreignField: "role_id",
-                as: "role",
-              },
-            },
-            {
-              $unwind: "$role",
-            },
-          ])
-          .exec((err, data) => {
-            if (err) reject(err);
-            resolve(data);
-          });
-      }
+    User.aggregate([
+      {
+        $match: { type: type },
+      },
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role_id",
+          foreignField: "role_id",
+          as: "role",
+        },
+      },
+      {
+        $unwind: "$role",
+      },
+    ]).exec((err, data) => {
+      if (err) reject(err);
+      resolve(data[0]);
     });
   });
 };
 
 let findRole = (type, role) => {
   return new Promise((resolve, reject) => {
-    User.find({ type: type, role_id: role }, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        data
-          .aggregate([
-            {
-              $lookup: {
-                from: "roles",
-                localField: "role_id",
-                foreignField: "role_id",
-                as: "role",
-              },
-            },
-            {
-              $unwind: "$role",
-            },
-          ])
-          .exec((err, data) => {
-            if (err) reject(err);
-            resolve(data);
-          });
-      }
+    User.aggregate([
+      {
+        $match: { role: role_id, type: type },
+      },
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role_id",
+          foreignField: "role_id",
+          as: "role",
+        },
+      },
+      {
+        $unwind: "$role",
+      },
+    ]).exec((err, data) => {
+      if (err) reject(err);
+      resolve(data[0]);
     });
   });
 };
