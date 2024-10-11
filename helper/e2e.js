@@ -19,7 +19,7 @@ let response = (data, status) => {
   let obj = {
     con: status,
     data: status == true ? data : data,
-    // data: status == true ? encrypt(JSON.stringify(data)) : data,
+    data: status == true ? encrypt(JSON.stringify(data)) : data,
     message: status == true ? "Success" : "Unsuccessful",
     status: status == true ? 200 : 500,
     length: status == true ? data.length : 0,

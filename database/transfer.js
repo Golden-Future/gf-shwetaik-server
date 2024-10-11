@@ -27,18 +27,49 @@ let update = (obj) => {
       if (err) {
         reject(err);
       } else {
-        data.code =
-          obj.code == null || obj.code == undefined ? data.code : obj.code;
-        data.location.CODE =
-          obj.location.CODE == null || obj.location.CODE == undefined
-            ? data.location.CODE
-            : obj.location.CODE;
-        data.location.DESCRIPTION =
-          obj.location.DESCRIPTION == null ||
-          obj.location.DESCRIPTION == undefined
-            ? data.location.DESCRIPTION
-            : obj.location.DESCRIPTION;
-        data.QTY = obj.QTY == null || obj.QTY == undefined ? data.QTY : obj.QTY;
+        // type: { type: String },
+        // insert_status: { type: Boolean },
+        //       since: { type: Date },
+
+        data.productCode =
+          obj.productCode == null || obj.productCode == undefined
+            ? data.productCode
+            : obj.productCode;
+        data.req_id =
+          obj.req_id == null || obj.req_id == undefined
+            ? data.req_id
+            : obj.req_id;
+        data.qty = obj.qty == null || obj.qty == undefined ? data.qty : obj.qty;
+        data.req_id =
+          obj.req_id == null || obj.req_id == undefined
+            ? data.req_id
+            : obj.req_id;
+        data.req_location =
+          obj.req_location == null || obj.req_location == undefined
+            ? data.req_location
+            : obj.req_location;
+        data.res_id =
+          obj.res_id == null || obj.res_id == undefined
+            ? data.res_id
+            : obj.res_id;
+        data.res_location =
+          obj.res_location == null || obj.res_location == undefined
+            ? data.res_location
+            : obj.res_location;
+        data.status =
+          obj.status == null || obj.status == undefined
+            ? data.status
+            : obj.status;
+        data.description =
+          obj.description == null || obj.description == undefined
+            ? data.description
+            : obj.description;
+        data.type =
+          obj.type == null || obj.type == undefined ? data.type : obj.type;
+        data.insert_status =
+          obj.insert_status == null || obj.qty == undefined
+            ? data.insert_status
+            : obj.insert_status;
         data.since = new Date();
         data.save((error, datas) => {
           if (error) {
@@ -54,17 +85,37 @@ let update = (obj) => {
 
 let find = (id, status) => {
   return new Promise((resolve, reject) => {
-    if (status == "req") {
-      Transfer.find({ req_id: id }, (err, data) => {
-        if (err) reject(err);
-        resolve(data);
-      });
-    } else if (status == "res") {
-      Transfer.find({ res_id: id }, (err, data) => {
-        if (err) reject(err);
-        resolve(data);
-      });
-    }
+    Transfer.find({ req_id: id }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        data.find({ status: status }, (error, datas) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(datas);
+          }
+        });
+      }
+    });
+  });
+};
+
+let findCode = (code, status) => {
+  return new Promise((resolve, reject) => {
+    Transfer.find({ code: id }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        data.find({ status: status }, (error, datas) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(datas);
+          }
+        });
+      }
+    });
   });
 };
 
@@ -83,4 +134,5 @@ module.exports = {
   update,
   find,
   destory,
+  findCode,
 };

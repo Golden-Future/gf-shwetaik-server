@@ -733,10 +733,22 @@ module.exports = () => {
       .catch((error) => res.json(response(error, false)));
   });
 
+  router.post("/superuser/update/transfer", (req, res) => {
+    Transfer.update(req.body)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
   router.post("/superuser/find/transfer", (req, res) => {
     let id = req.body.role_id;
     let status = req.body.status;
     Transfer.find(id, status)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post("/superuser/find/transfer/code", (req, res) => {
+    Transfer.findCode(req.body)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
