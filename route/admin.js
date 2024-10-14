@@ -67,7 +67,7 @@ module.exports = () => {
           .then((data) => {
             if (data) {
               let payload = { email: result.email, name: result.name };
-              let token = jwt.sign(payload, process.env.SECRET);
+              let token = jwt.sign(payload, process.env.CORESECRET);
               // let data = encrypt.encrypt(JSON.stringify(result));
               res.json({
                 con: true,

@@ -179,25 +179,10 @@ let find = (id) => {
 
 let findEmail = (email) => {
   return new Promise((resolve, reject) => {
-    User.aggregate([
-      {
-        $match: { email: email },
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
-      if (err) reject(err);
-      resolve(data[0]);
-    });
+    User.findOne({email: email},(err,data)=>{
+      if(err) reject(err);
+      resolve(data)
+    })
   });
 };
 
