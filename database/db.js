@@ -1,21 +1,20 @@
 const mongoose = require("mongoose");
 let paginate = require("mongoose-paginate");
 let url = "mongodb://127.0.0.1:27017/shweTaikInternational";
-mongoose.connect(url, { useNewUrlParser: true });
-// .then(() => console.log("Connected to database"))
-// .catch((err) => console.log(err));
+mongoose.connect(url, { useNewUrlParser: true })
+.then(() => console.log("Connected to database"))
+.catch((err) => console.log(err));
 let autoI = require("simple-mongoose-autoincrement");
 let Schema = mongoose.Schema;
 
 let UserScheme = new Schema({
   phone: { type: String },
   phone1: { type: String },
-  notiToken: { type: String },
+  token: { type: String },
   address: { type: String },
   address1: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String },
-  role_id: { type: Number },
   name: { type: String },
   userName: { type: String },
   type: { type: String },
@@ -113,6 +112,22 @@ let RoleScheme = new Schema({
   since: { type: Date, required: true },
 });
 
+let permissionScheme = new Schema({
+  read: { type: Boolean },
+  create: { type: Boolean },
+  update: { type: Boolean },
+  delete: { type: Boolean },
+  task: { type: String },
+  role_id: { type: mongoose.Schema.Types.ObjectId, ref: "Roles" },
+  since: { type: Date }
+});
+
+let RoleListScheme = new Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
+  role_id: { type: mongoose.Schema.Types.ObjectId, ref: "Roles" },
+  since: { type: Date }
+});
+
 let ColorScheme = new Schema({
   colorCode: { type: String },
   since: { type: Date, required: true },
@@ -145,56 +160,10 @@ let announcementScheme = new Schema({
   since: { type: Date },
 });
 
-let ST_AVAscheme = new Schema({
-  code: { type: String },
-  quantity: { type: Number },
-  seller_id: { type: Number },
-  location: { type: String },
-  status: { type: Boolean },
-  since: { type: Date },
-});
-
 let P_IVScheme = new Schema({
   localIV_id: { type: Number },
   sum: { type: Number },
   since: { type: Date },
-});
-
-let MV_Userscheme = new Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String },
-  type: { type: String },
-  since: { type: Date, required: true },
-});
-
-let MV_Moviescheme = new Schema({
-  photo: { type: String },
-  coverphoto: { type: String },
-  title: { type: String },
-  description: { type: String },
-  tmdbID: { type: Number },
-  since: { type: Date },
-});
-
-let ShopScheme = new Schema({
-  name: { type: String },
-  logo: { type: String },
-  phone: { type: String },
-  phone1: { type: String },
-  email: { type: String },
-  email1: { type: String },
-  address: { type: String },
-  since: { type: Date },
-});
-
-let categoryScheme = new Schema({
-  name: { type: String },
-  since: { type: Date },
-});
-
-let itemScheme = new Schema({
-  photo: { type: String },
-  name: { type: String },
 });
 
 // Car Rental
@@ -203,6 +172,16 @@ let carScheme = new Schema({
   car_no: { type: String },
   type: { type: String },
   photo: { type: String },
+  photo1: { type: String },
+  photo2: { type: String },
+  since: { type: Date },
+});
+
+let driverScheme = new Schema({
+  name: { type: String },
+  email: { type: String },
+  password: { type: String },
+  phone: { type: String },
   since: { type: Date },
 });
 
@@ -211,62 +190,49 @@ let statusScheme = new Schema({
   since: { type: Date },
 });
 
-let logScheme = new Schema({
-  description: { type: String },
-  user_id: { type: Number },
-  Way_id: { type: Number },
-  since: { type: Date },
-});
-
-let commentScheme = new Schema({
-  description: { type: String },
-  user_id: { type: Number },
-  Way_id: { type: Number },
-  since: { type: Date },
-});
-
 let wayScheme = new Schema({
-  from: { type: String },
+  fromLocation: { type: String },
+  toLocation: { type: String },
   fromDate: { type: Date },
   toDate: { type: Date },
-  to: { type: String },
   title: { type: String },
   description: { type: String },
-  Car_id: { type: Number },
-  Driver_id: { type: Number },
-  Reporter_id: { type: Number },
-  time: {
-    duration: { type: Number },
-    UCT_code: { type: String },
-  },
+  driver_id: { type: Number },
+  car_id: { type: Number },
   type: { type: String },
   price: { type: Number },
+  car_no: { type: String },
   total: { type: Number },
-  Status_id: { type: Number },
+  status_id: { type: Number },
   since: { type: Date },
 });
 
-// Car Rental
 
-statusScheme.plugin(autoI, { field: "Status_id" });
+permissionScheme.plugin(autoI, { field: "permission_id" });
+permissionScheme.plugin(paginate);
+let Permission = mongoose.model("Permission", permissionScheme);
+
+RoleListScheme.plugin(autoI, { field: "roleList_id" });
+RoleListScheme.plugin(paginate);
+let RoleList = mongoose.model("RoleLists", RoleListScheme);
+
+carScheme.plugin(autoI, { field: "car_id" });
+carScheme.plugin(paginate);
+let Car = mongoose.model("Cars", carScheme);
+
+driverScheme.plugin(autoI, { field: "driver_id" });
+driverScheme.plugin(paginate);
+let Driver = mongoose.model("Drivers", driverScheme);
+
+statusScheme.plugin(autoI, { field: "status_id" });
 statusScheme.plugin(paginate);
 let Status = mongoose.model("Status", statusScheme);
 
-logScheme.plugin(autoI, { field: "Log_id" });
-logScheme.plugin(paginate);
-let Logs = mongoose.model("Logs", logScheme);
-
-commentScheme.plugin(autoI, { field: "Comment_id" });
-commentScheme.plugin(paginate);
-let Comments = mongoose.model("Comments", commentScheme);
-
-wayScheme.plugin(autoI, { field: "Way_id" });
+wayScheme.plugin(autoI, { field: "way_id" });
 wayScheme.plugin(paginate);
 let Way = mongoose.model("Ways", wayScheme);
 
-carScheme.plugin(autoI, { field: "Car_id" });
-carScheme.plugin(paginate);
-let Car = mongoose.model("Cars", carScheme);
+// Car Rental
 
 TransferScheme.plugin(autoI, { field: "Transfer_id" });
 TransferScheme.plugin(paginate);
@@ -280,21 +246,9 @@ Product_CodeScheme.plugin(autoI, { field: "Product_Code_id" });
 Product_CodeScheme.plugin(paginate);
 let Product_Code = mongoose.model("Product_Codes", Product_CodeScheme);
 
-MV_Userscheme.plugin(autoI, { field: "MV_User_id" });
-MV_Userscheme.plugin(paginate);
-let MV_User = mongoose.model("MV_Users", MV_Userscheme);
-
-MV_Moviescheme.plugin(autoI, { field: "MV_Movie_id" });
-MV_Moviescheme.plugin(paginate);
-let MV_Movie = mongoose.model("MV_Movies", MV_Moviescheme);
-
 P_IVScheme.plugin(autoI, { field: "PIV_id" });
 P_IVScheme.plugin(paginate);
 let P_IV = mongoose.model("PIvs", P_IVScheme);
-
-ST_AVAscheme.plugin(autoI, { field: "STAVA_id" });
-ST_AVAscheme.plugin(paginate);
-let ST_AVA = mongoose.model("STAVAs", ST_AVAscheme);
 
 IV_GoodScheme.plugin(autoI, { field: "ivGood_id" });
 IV_GoodScheme.plugin(paginate);
@@ -357,16 +311,14 @@ module.exports = {
   PriceCodes,
   IV_Good,
   IV_LOCAL,
-  ST_AVA,
   P_IV,
   Product_Code,
-  MV_Movie,
-  MV_User,
   TeamCode,
   Transfers,
   Car,
+  Driver,
   Way,
-  Logs,
-  Comments,
   Status,
+  Permission,
+  RoleList
 };

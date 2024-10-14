@@ -103,7 +103,7 @@ let find = (id, status) => {
 
 let findCode = (code, status) => {
   return new Promise((resolve, reject) => {
-    Transfer.find({ code: id }, (err, data) => {
+    Transfer.find({ code: code }, (err, data) => {
       if (err) {
         reject(err);
       } else {

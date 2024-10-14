@@ -16,15 +16,14 @@ let encrypt = (text) => {
 };
 
 let response = (data, status) => {
-  let obj = {
+  return {
     con: status,
-    data: status == true ? data : data,
-    data: status == true ? encrypt(JSON.stringify(data)) : data,
-    message: status == true ? "Success" : "Unsuccessful",
-    status: status == true ? 200 : 500,
-    length: status == true ? data.length : 0,
+    data: status === true ? data : data,
+    // data: status === true ? encrypt(JSON.stringify(data)) : data,
+    message: status === true ? "Success" : "Unsuccessful",
+    status: status === true ? 200 : 500,
+    length: status === true ? data.length : 0,
   };
-  return obj;
 };
 
 module.exports = {

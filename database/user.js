@@ -1,32 +1,11 @@
 let db = require("./db");
 let User = db.User;
 
-let allU = () => {
+let all = () => {
   return new Promise((resolve, reject) => {
     User.find({}, (err, d) => {
       if (err) reject(err);
       resolve(d);
-    });
-  });
-};
-
-let all = () => {
-  return new Promise((resolve, reject) => {
-    User.aggregate([
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
-      if (err) reject(err);
-      resolve(data);
     });
   });
 };
@@ -238,7 +217,6 @@ module.exports = {
   find,
   findEmail,
   destory,
-  allU,
   findType,
   findRole,
 };

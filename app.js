@@ -12,11 +12,33 @@ const firebird = require("node-firebird");
 const app = express();
 const genericPool = require("generic-pool");
 
-const jwtOption = {};
-jwtOption.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-jwtOption.secretOrKey = process.env.SECRET;
+// Strategy options for car
+const carJwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.CARSECRET,
+};
 
-const Strategy = new JwtStrategy(jwtOption, (payload, done) => {
+// Strategy options for core
+const coreJwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.CORESECRET,
+};
+
+// Car JWT Strategy
+const carStrategy = new JwtStrategy(carJwtOptions, (payload, done) => {
+  const email = payload.email;
+  User.findEmail(email)
+    .then((user) => {
+      if (user) {
+        return done(null, user);
+      }
+      return done(null, false);
+    })
+    .catch((err) => done(err, null));
+});
+
+// Admin JWT Strategy
+const coreStrategy = new JwtStrategy(coreJwtOptions, (payload, done) => {
   const email = payload.email;
   const name = payload.name;
   User.findEmail(email)
@@ -30,15 +52,35 @@ const Strategy = new JwtStrategy(jwtOption, (payload, done) => {
     .catch((err) => done(err, null));
 });
 
-passport.use(Strategy);
+// Use both strategies in passport
+passport.use("car-jwt", carStrategy);
+passport.use("core-jwt", coreStrategy);
+
+// Middleware to initialize passport
+app.use(passport.initialize());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 const adminRoute = require("./route/admin")(express, jwt, passport, bodyParser);
+const carRoute = require("./route/car")(express, jwt, passport, bodyParser);
 const movieRoute = require("./route/movie")(express);
 app.use("/admin", adminRoute);
+app.use("/car", carRoute);
 app.use("/movie", movieRoute);
+
+// Routes for admin with admin strategy protection
+app.use(
+  "/admin",
+  passport.authenticate("core-jwt", { session: false }),
+  adminRoute
+);
+
+// Routes for user with user strategy protection
+app.use("/car",
+    passport.authenticate("car-jwt", { session: false }),
+    carRoute);
 
 var options = {};
 
