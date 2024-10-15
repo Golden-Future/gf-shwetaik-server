@@ -11,6 +11,7 @@ const firebird = require("node-firebird");
 // let encrypt = require("./helper/e2e");
 const app = express();
 const genericPool = require("generic-pool");
+const CarUser = require("./database/carUser");
 
 // Strategy options for car
 const carJwtOptions = {
@@ -27,7 +28,7 @@ const coreJwtOptions = {
 // Car JWT Strategy
 const carStrategy = new JwtStrategy(carJwtOptions, (payload, done) => {
   const email = payload.email;
-  User.findEmail(email)
+  CarUser.findEmail(email)
     .then((user) => {
       if (user) {
         return done(null, user);

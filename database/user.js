@@ -16,26 +16,7 @@ let save = (obj) => {
     let user = new User(obj);
     user.save((err, savedUser) => {
       if (err) return reject(err);
-
-      User.aggregate([
-        {
-          $match: { user_id: savedUser.user_id },
-        },
-        {
-          $lookup: {
-            from: "roles",
-            localField: "role_id",
-            foreignField: "role_id",
-            as: "role",
-          },
-        },
-        {
-          $unwind: "$role",
-        },
-      ]).exec((aggErr, data) => {
-        if (aggErr) return reject(aggErr);
-        resolve(data[0]);
-      });
+      resolve(savedUser);
     });
   });
 };
@@ -58,10 +39,6 @@ let update = (obj) => {
           obj.password == null || obj.password == undefined
             ? data.password
             : obj.password;
-        data.role_id =
-          obj.role_id == null || obj.role_id == undefined
-            ? data.role_id
-            : obj.role_id;
         data.name =
           obj.name == null || obj.name == undefined ? data.name : obj.name;
         data.type =
@@ -79,76 +56,10 @@ let update = (obj) => {
           if (error) {
             reject(error);
           } else {
-            User.aggregate([
-              {
-                $match: { user_id: datas.user_id },
-              },
-              {
-                $lookup: {
-                  from: "roles",
-                  localField: "role_id",
-                  foreignField: "role_id",
-                  as: "role",
-                },
-              },
-              {
-                $unwind: "$role",
-              },
-            ]).exec((e, d) => {
-              if (e) reject(e);
-              resolve(d);
-            });
+            resolve(datas);
           }
         });
       }
-    });
-  });
-};
-
-let findType = (type) => {
-  return new Promise((resolve, reject) => {
-    User.aggregate([
-      {
-        $match: { type: type },
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
-      if (err) reject(err);
-      resolve(data[0]);
-    });
-  });
-};
-
-let findRole = (type, role) => {
-  return new Promise((resolve, reject) => {
-    User.aggregate([
-      {
-        $match: { role: role_id, type: type },
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
-      if (err) reject(err);
-      resolve(data[0]);
     });
   });
 };
@@ -179,10 +90,10 @@ let find = (id) => {
 
 let findEmail = (email) => {
   return new Promise((resolve, reject) => {
-    User.findOne({email: email},(err,data)=>{
-      if(err) reject(err);
-      resolve(data)
-    })
+    User.findOne({ email: email }, (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
   });
 };
 
@@ -202,6 +113,4 @@ module.exports = {
   find,
   findEmail,
   destory,
-  findType,
-  findRole,
 };

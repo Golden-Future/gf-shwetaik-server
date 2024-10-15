@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 let paginate = require("mongoose-paginate");
 let url = "mongodb://127.0.0.1:27017/shweTaikInternational";
-mongoose.connect(url, { useNewUrlParser: true })
-.then(() => console.log("Connected to database"))
-.catch((err) => console.log(err));
+mongoose
+  .connect(url, { useNewUrlParser: true })
+  .then(() => console.log("Connected to database"))
+  .catch((err) => console.log(err));
 let autoI = require("simple-mongoose-autoincrement");
 let Schema = mongoose.Schema;
 
@@ -21,6 +22,12 @@ let UserScheme = new Schema({
   photo: { type: String },
   lang: { type: String },
   since: { type: Date, required: true },
+});
+
+let carUserScheme = new Schema({
+  email: { type: String, unique: true, required: true },
+  password: { type: String },
+  since: { type: Date },
 });
 
 let LOCAL_IVScheme = new Schema({
@@ -118,14 +125,14 @@ let permissionScheme = new Schema({
   update: { type: Boolean },
   delete: { type: Boolean },
   task: { type: String },
-  role_id: { type: mongoose.Schema.Types.ObjectId, ref: "Roles" },
-  since: { type: Date }
+  role_id: { type: Number },
+  since: { type: Date },
 });
 
 let RoleListScheme = new Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
-  role_id: { type: mongoose.Schema.Types.ObjectId, ref: "Roles" },
-  since: { type: Date }
+  user_id: { type: Number },
+  role_id: { type: Number },
+  since: { type: Date },
 });
 
 let ColorScheme = new Schema({
@@ -207,6 +214,9 @@ let wayScheme = new Schema({
   since: { type: Date },
 });
 
+carUserScheme.plugin(autoI, { field: "carUser_id" });
+carUserScheme.plugin(paginate);
+let carUser = mongoose.model("carUser", carUserScheme);
 
 permissionScheme.plugin(autoI, { field: "permission_id" });
 permissionScheme.plugin(paginate);
@@ -320,5 +330,6 @@ module.exports = {
   Way,
   Status,
   Permission,
-  RoleList
+  RoleList,
+  carUser,
 };
