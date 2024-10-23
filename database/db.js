@@ -88,7 +88,7 @@ let PriceCodeScheme = new Schema({
   eight: { type: String },
   nine: { type: String },
   zero: { type: String },
-  role_id: { type: Number },
+  priceTag: { type: String },
   active: { type: Boolean },
   since: { type: Date, required: true },
 });

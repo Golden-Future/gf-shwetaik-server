@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
 
 let express = require("express");
 const Comment = require("../database/comment");
-const {response} = require("../helper/e2e");
+const { response } = require("../helper/e2e");
 const RoleList = require("../database/roleList");
 const Permission = require("../database/permission");
 module.exports = () => {
@@ -588,7 +588,7 @@ module.exports = () => {
   // ****** Price CODE ******* //
 
   router.get("/superuser/api/v_1/all/pcode", (req, res) => {
-    PriceCode.allU()
+    PriceCode.all()
       .then((result) => {
         res.json(response(result, true));
       })
@@ -614,7 +614,7 @@ module.exports = () => {
       nine: req.body.nine,
       zero: req.body.zero,
       active: req.body.active,
-      role_id: req.body.role_id,
+      priceTag: req.body.priceTag,
     };
     PriceCode.save(obj)
       .then((result) => res.json(response(result, true)))
@@ -634,24 +634,10 @@ module.exports = () => {
       nine: req.body.nine,
       zero: req.body.zero,
       active: req.body.active,
-      role_id: req.body.role_id,
+      priceTag: req.body.priceTag,
       pricecode_id: req.body.pricecode_id,
     };
     PriceCode.update(obj)
-      .then((result) => res.json(response(result, true)))
-      .catch((error) => res.json(response(error, false)));
-  });
-
-  router.post("/superuser/find/pcode", (req, res) => {
-    let id = req.body.pricecode_id;
-    PriceCode.find(id)
-      .then((result) => res.json(response(result, true)))
-      .catch((error) => res.json(response(error, false)));
-  });
-
-  router.post("/superuser/findid/pcode", (req, res) => {
-    let id = req.body.role_id;
-    PriceCode.findid(id)
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
@@ -950,39 +936,38 @@ module.exports = () => {
 
   // ************* Car ********************
 
-
   // ************  ROLELIST ***************
 
   router.get("/superuser/all/roleList", (req, res) => {
     RoleList.all()
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/roleList", (req, res) => {
     RoleList.save(req.body)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/roleList", (req, res) => {
     RoleList.update(req.body)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/find/roleList", (req, res) => {
     let id = req.body.user_id;
     RoleList.findByUserid(id)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/roleList", (req, res) => {
     let id = req.body.roleList_id;
     RoleList.destory(id)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ************  ROLELIST ***************
@@ -991,34 +976,34 @@ module.exports = () => {
 
   router.get("/superuser/all/permission", (req, res) => {
     Permission.all()
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/save/permission", (req, res) => {
     Permission.save(req.body)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/update/permission", (req, res) => {
     Permission.update(req.body)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/find/permission", (req, res) => {
     let id = req.body.role_id;
     Permission.findByRoleId(id)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   router.post("/superuser/delete/permission", (req, res) => {
     let id = req.body.Comment_id;
     Permission.destory(id)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
   });
 
   // ************  PERMISSION ***************

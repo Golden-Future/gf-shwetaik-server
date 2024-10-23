@@ -1,32 +1,11 @@
 let db = require("./db");
 let PriceCodes = db.PriceCodes;
 
-let allU = () => {
+let all = () => {
   return new Promise((resolve, reject) => {
     PriceCodes.find({}, (err, d) => {
       if (err) reject(err);
       resolve(d);
-    });
-  });
-};
-
-let all = () => {
-  return new Promise((resolve, reject) => {
-    PriceCodes.aggregate([
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
-      if (err) reject(err);
-      resolve(data);
     });
   });
 };
@@ -37,26 +16,7 @@ let save = (obj) => {
     let price = new PriceCodes(obj);
     price.save((err, savedUser) => {
       if (err) return reject(err);
-
-      PriceCodes.aggregate([
-        {
-          $match: { pricecode_id: savedUser.pricecode_id },
-        },
-        {
-          $lookup: {
-            from: "roles",
-            localField: "role_id",
-            foreignField: "role_id",
-            as: "role",
-          },
-        },
-        {
-          $unwind: "$role",
-        },
-      ]).exec((aggErr, data) => {
-        if (aggErr) return reject(aggErr);
-        resolve(data[0]);
-      });
+      resolve(savedUser);
     });
   });
 };
@@ -84,10 +44,10 @@ let update = (obj) => {
           obj.nine == null || obj.nine == undefined ? data.nine : obj.nine;
         data.zero =
           obj.zero == null || obj.zero == undefined ? data.zero : obj.zero;
-        data.role_id =
-          obj.role_id == null || obj.role_id == undefined
-            ? data.role_id
-            : obj.role_id;
+        data.priceTag =
+          obj.priceTag == null || obj.priceTag == undefined
+            ? data.priceTag
+            : obj.priceTag;
         data.active =
           obj.active == null || obj.active == undefined
             ? data.active
@@ -97,61 +57,10 @@ let update = (obj) => {
           if (error) {
             reject(error);
           } else {
-            PriceCodes.aggregate([
-              {
-                $match: { pricecode_id: datas.pricecode_id },
-              },
-              {
-                $lookup: {
-                  from: "roles",
-                  localField: "role_id",
-                  foreignField: "role_id",
-                  as: "role",
-                },
-              },
-              {
-                $unwind: "$role",
-              },
-            ]).exec((e, d) => {
-              if (e) reject(e);
-              resolve(d);
-            });
+            resolve(datas);
           }
         });
       }
-    });
-  });
-};
-
-let find = (id) => {
-  return new Promise((resolve, reject) => {
-    PriceCodes.aggregate([
-      {
-        $match: { pricecode_id: pricecode_id },
-      },
-      {
-        $lookup: {
-          from: "roles",
-          localField: "role_id",
-          foreignField: "role_id",
-          as: "role",
-        },
-      },
-      {
-        $unwind: "$role",
-      },
-    ]).exec((err, data) => {
-      if (err) reject(err);
-      resolve(data[0]);
-    });
-  });
-};
-
-let findid = (id) => {
-  return new Promise((resolve, reject) => {
-    PriceCodes.findOne({ role_id: id }, (err, data) => {
-      if (err) reject(err);
-      resolve(data);
     });
   });
 };
@@ -169,8 +78,5 @@ module.exports = {
   all,
   save,
   update,
-  find,
-  findid,
   destory,
-  allU,
 };
