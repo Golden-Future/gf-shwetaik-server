@@ -79,9 +79,7 @@ app.use(
 );
 
 // Routes for user with user strategy protection
-app.use("/car",
-    passport.authenticate("car-jwt", { session: false }),
-    carRoute);
+app.use("/car", passport.authenticate("car-jwt", { session: false }), carRoute);
 
 var options = {};
 
@@ -206,39 +204,39 @@ const pool = genericPool.createPool(factory, {
   idleTimeoutMillis: 30000, // Idle time before releasing the connection
 });
 
-// app.get("/table/:name/:page/:size", (req, res) => {
-//   const name = req.params.name;
-//   let page = parseInt(req.params.page, 10);
-//   let size = parseInt(req.params.size, 10);
+app.get("/table/:name/:page/:size", (req, res) => {
+  const name = "ST_ITEM";
+  let page = parseInt(req.params.page, 10);
+  let size = parseInt(req.params.size, 10);
 
-//   // Validate page and size
-//   if (isNaN(page) || isNaN(size) || page < 1 || size < 1) {
-//     return res.status(400).send("Invalid page or size parameter.");
-//   }
+  // Validate page and size
+  if (isNaN(page) || isNaN(size) || page < 1 || size < 1) {
+    return res.status(400).send("Invalid page or size parameter.");
+  }
 
-//   const offset = (page - 1) * size;
-//   const limit = size;
+  const offset = (page - 1) * size;
+  const limit = size;
 
-//   firebird.attach(options, function (err, db) {
-//     if (err) {
-//       return res.status(500).send("Database connection failed: " + err.message);
-//     }
+  firebird.attach(options, function (err, db) {
+    if (err) {
+      return res.status(500).send("Database connection failed: " + err.message);
+    }
 
-//     const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${
-//       offset + limit
-//     }`;
+    const query = `SELECT * FROM ${name} ROWS ${offset + 1} TO ${
+      offset + limit
+    }`;
 
-//     db.query(query, function (err, result) {
-//       if (err) {
-//         db.detach();
-//         return res.status(500).send("Query failed: " + err.message);
-//       }
+    db.query(query, function (err, result) {
+      if (err) {
+        db.detach();
+        return res.status(500).send("Query failed: " + err.message);
+      }
 
-//       res.json(result);
-//       db.detach();
-//     });
-//   });
-// });
+      res.json(result);
+      db.detach();
+    });
+  });
+});
 
 // app.post("/table/find", (req, res) => {
 //   const { tableName, uniquekey, data } = req.body;

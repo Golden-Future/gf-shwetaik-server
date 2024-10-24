@@ -9,6 +9,7 @@ module.exports = () => {
     Way = require("../database/way"),
     Status = require("../database/car_status"),
     Driver = require("../database/driver"),
+    Language = require("../database/language"),
     CarUser = require("../database/carUser");
   /*** api */
   const ENV = require("../env/env").environment;
@@ -39,22 +40,18 @@ module.exports = () => {
       .then((result) => {
         bcrypt
           .compare(password, result.password)
-          .then((res) => {
-            console.log(res);
-            // if (res) {
-            // let payload = { email: result.email, name: result.carUser_id };
-            // let token = jwt.sign(payload, process.env.CARSECRET);
-            // let data = encrypt.encrypt(JSON.stringify(result));
-            // console.log(res, token, payload, result);
-            res.json({
-              con: res,
-              // token: token,
-              data: result,
-              msg: `Login Successful!`,
-            });
-            // } else {
-            //   res.json({ con: false, msg: "Password Wrong" });
-            // }
+          .then((ress) => {
+            console.log(ress);
+            if (ress) {
+              console.log("sdsd");
+              // let payload = { email: result.email, name: result.carUser_id };
+              // let token = jwt.sign(payload, process.env.CARSECRET);
+              // let data = encrypt.encrypt(JSON.stringify(result));
+              // console.log(res, token, payload, result);
+              res.send({ con: true, data: result, msg: "success" });
+            } else {
+              res.json({ con: false, msg: "Password Wrong" });
+            }
           })
           // .catch((error) => res.json(response(error, false)));
           .catch((error) => res.json({ con: false, msg: error }));
@@ -70,54 +67,50 @@ module.exports = () => {
   });
   // ****** CAR ******* //
 
-  router.get(
-    `${API}/car`,
-    // passport.authenticate("car-jwt", {session: false}),
-    (req, res) => {
-      Car.all()
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
-    },
-  );
+  router.get(`${API}/car`, (req, res) => {
+    Car.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
 
   router.post(
-    `${API}/car/find`,
-    passport.authenticate("car-jwt", { session: false }),
+    `${API}/car`,
+
     (req, res) => {
       Car.save(req.body)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.post(
-    `${API}/car`,
-    passport.authenticate("car-jwt", { session: false }),
+    `${API}/car/find`,
+
     (req, res) => {
       Car.find(req.body.car_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.put(
     `${API}/car`,
-    passport.authenticate("car-jwt", { session: false }),
+
     (req, res) => {
       Car.update(req.body)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
-  router.delete(
-    `${API}/car`,
-    passport.authenticate("car-jwt", { session: false }),
+  router.post(
+    `${API}/car/delete`,
+
     (req, res) => {
       Car.destory(req.body.car_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   // ****** CAR ******* //
@@ -131,47 +124,48 @@ module.exports = () => {
       Status.all()
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
+  );
+
+  router.post(
+    `${API}/status`,
+    // passport.authenticate("car-jwt", {session: false}),
+    (req, res) => {
+      // res.send(req.body);
+      Status.save(req.body)
+        .then((result) => res.json(response(result, true)))
+        .catch((error) => res.json(response(error, false)));
+    }
   );
 
   router.post(
     `${API}/status/find`,
     // passport.authenticate("car-jwt", {session: false}),
     (req, res) => {
-      Status.save(req.body)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
-    },
-  );
-
-  router.post(
-    `${API}/status`,
-    // passport.authenticate("car-jwt", {session: false}),
-    (req, res) => {
       Status.find(req.body.status_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.put(
     `${API}/status`,
-    passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
       Status.update(req.body)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
-  router.delete(
-    `${API}/status`,
-    passport.authenticate("car-jwt", { session: false }),
+  router.post(
+    `${API}/status/delete`,
+    //
     (req, res) => {
       Status.destory(req.body.status_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   // ****** STATUS ******* //
@@ -180,52 +174,52 @@ module.exports = () => {
 
   router.get(
     `${API}/driver`,
-    passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
       Driver.all()
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
+  );
+
+  router.post(
+    `${API}/driver`,
+    //
+    (req, res) => {
+      Driver.save(req.body)
+        .then((result) => res.json(response(result, true)))
+        .catch((error) => res.json(response(error, false)));
+    }
   );
 
   router.post(
     `${API}/driver/find`,
-    passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
-      Status.save(req.body)
+      Driver.find(req.body.driver_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
-  );
-
-  router.post(
-    `${API}/driver`,
-    passport.authenticate("car-jwt", { session: false }),
-    (req, res) => {
-      Status.find(req.body.driver_id)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.put(
     `${API}/driver`,
-    passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
-      Status.update(req.body)
+      Driver.update(req.body)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
-  router.delete(
-    `${API}/driver`,
-    passport.authenticate("car-jwt", { session: false }),
+  router.post(
+    `${API}/driver/delete`,
+    //
     (req, res) => {
-      Status.destory(req.body.driver_id)
+      Driver.destory(req.body.driver_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   // ****** DRIVER ******* //
@@ -234,65 +228,77 @@ module.exports = () => {
 
   router.get(
     `${API}/way`,
-    // passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
       Way.all()
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.post(
-    `${API}/way/find`,
-    // passport.authenticate("car-jwt", { session: false }),
+    `${API}/way`,
+    //
     (req, res) => {
       Way.save(req.body)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
-  router.post(
-    `${API}/way`,
-    // passport.authenticate("car-jwt", { session: false }),
-    (req, res) => {
-      Way.find(req.body.way_id)
-        .then((result) => res.json(response(result, true)))
-        .catch((error) => res.json(response(error, false)));
-    },
-  );
+  // router.post(
+  //   `${API}/way/find`,
+  //   //
+  //   (req, res) => {
+  //     Way.find(req.body.way_id)
+  //       .then((result) => res.json(response(result, true)))
+  //       .catch((error) => res.json(response(error, false)));
+  //   }
+  // );
 
   router.put(
     `${API}/way`,
-    // passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
       Way.update(req.body)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.delete(
     `${API}/way`,
-    // passport.authenticate("car-jwt", { session: false }),
+    //
     (req, res) => {
       Way.destory(req.body.way_id)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   router.post(
-    `${API}/way`,
-    // passport.authenticate("car-jwt", { session: false }),
+    `${API}/way/date`,
+    //
     (req, res) => {
       Way.findByPeriod(req.body.fromDate, req.body.toDate)
         .then((result) => res.json(response(result, true)))
         .catch((error) => res.json(response(error, false)));
-    },
+    }
   );
 
   // ****** WAY ******* //
+
+  // ****** LANGUAGE ****** //
+
+  router.get(
+    `${API}/all/language`,
+    //
+    (req, res) => {
+      Language.all()
+        .then((result) => res.json(response(result, true)))
+        .catch((error) => res.json(response(error, false)));
+    }
+  );
 
   return router;
 };
