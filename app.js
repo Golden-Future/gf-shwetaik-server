@@ -12,6 +12,9 @@ const firebird = require("node-firebird");
 const app = express();
 const genericPool = require("generic-pool");
 const CarUser = require("./database/carUser");
+const db = require("./database/db");
+let Way = db.Way;
+let Status = db.Status;
 
 // Strategy options for car
 const carJwtOptions = {
@@ -366,6 +369,24 @@ app.post("/table/find", (req, res) => {
     .catch((err) => {
       res.status(500).send("Database connection failed: " + err.message);
     });
+});
+
+app.get("/drop-collections", async (req, res) => {
+  try {
+    // Drop Status collection
+    await Status.collection.drop();
+    console.log("Status collection dropped");
+
+    // Drop Ways collection
+    await Way.collection.drop();
+    console.log("Ways collection dropped");
+
+    // Send response to the client
+    res.send("Status and Ways collections dropped successfully");
+  } catch (err) {
+    console.error("Error dropping collections:", err);
+    res.status(500).send("Error dropping collections: " + err.message);
+  }
 });
 
 app.listen(process.env.PORT, () => {
