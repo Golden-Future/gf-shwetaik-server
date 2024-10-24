@@ -86,7 +86,7 @@ app.use("/car", passport.authenticate("car-jwt", { session: false }), carRoute);
 
 var options = {};
 
-options.host = "localhost";
+options.host = "127.0.0.1";
 options.port = 3050;
 options.database = "/home/ACC-0008.FDB";
 options.user = "SYSDBA";
@@ -370,7 +370,31 @@ app.post("/table/find", (req, res) => {
       res.status(500).send("Database connection failed: " + err.message);
     });
 });
+let drop =  ()=>{
 
+<<<<<<< HEAD
+
+Way.collection.drop(function(err, result) {
+  if (err) {
+    console.log('Error dropping collection:', err);
+  } else {
+    console.log('Collection dropped successfully');
+  }
+});
+
+
+Status.collection.drop(function(err, result) {
+  if (err) {
+    console.log('Error dropping collection:', err);
+  } else {
+    console.log('Collection dropped successfully');
+  }
+});
+};
+
+
+//drop();
+=======
 app.get("/drop-collections", async (req, res) => {
   try {
     // Drop Status collection
@@ -389,6 +413,7 @@ app.get("/drop-collections", async (req, res) => {
   }
 });
 
+>>>>>>> 5f916ffb405775c7a6c0b2a5eae6d79b9e6119a7
 app.listen(process.env.PORT, () => {
   console.log(`Server is running at http://localhost:${process.env.PORT}`);
 });
