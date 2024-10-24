@@ -3,7 +3,41 @@ let Way = db.Way;
 
 let all = () => {
   return new Promise((resolve, reject) => {
-    Way.find({}, (err, data) => {
+    Way.aggregate([
+      {
+        $lookup: {
+          from: "drivers", // Look up the roles collection
+          localField: "driver_id", // Match based on role_id
+          foreignField: "driver_id",
+          as: "driver", // Output the results as "role"
+        },
+      },
+      {
+        $unwind: "$driver", // Unwind the role array to a single document
+      },
+      {
+        $lookup: {
+          from: "cars", // Look up the users collection
+          localField: "car_id", // Match based on user_id
+          foreignField: "car_id",
+          as: "car", // Output the results as "user"
+        },
+      },
+      {
+        $unwind: "$car",
+      },
+      {
+        $lookup: {
+          from: "status", // Look up the users collection
+          localField: "status_id", // Match based on user_id
+          foreignField: "status_id",
+          as: "status", // Output the results as "user"
+        },
+      },
+      {
+        $unwind: "$status",
+      },
+    ]).exec((err, data) => {
       if (err) reject(err);
       resolve(data);
     });
@@ -105,7 +139,7 @@ let update = (obj) => {
 
 let find = (id) => {
   return new Promise((resolve, reject) => {
-    Way.findOne({ Way_id: id }, (err, data) => {
+    Way.findOne({ way_id: id }, (err, data) => {
       if (err) reject(err);
       resolve(data);
     });
@@ -114,21 +148,24 @@ let find = (id) => {
 
 let findByPeriod = (fromDate, toDate) => {
   return new Promise((resolve, reject) => {
-    Way.find({
-      $or: [
-        { fromDate: { $gte: fromDate, $lte: toDate } },
-        { toDate: { $gte: fromDate, $lte: toDate } }
-      ]
-    },(err,data)=>{
-      if(err) reject(err);
-      resolve(data);
-    })
-  })
-}
+    Way.find(
+      {
+        $or: [
+          { fromDate: { $gte: fromDate, $lte: toDate } },
+          { toDate: { $gte: fromDate, $lte: toDate } },
+        ],
+      },
+      (err, data) => {
+        if (err) reject(err);
+        resolve(data);
+      }
+    );
+  });
+};
 
 let destory = (id) => {
   return new Promise((resolve, reject) => {
-    Way.deleteOne({ Way_id: id }, (err, data) => {
+    Way.deleteOne({ way_id: id }, (err, data) => {
       if (err) reject(err);
       resolve(data);
     });
@@ -141,5 +178,5 @@ module.exports = {
   update,
   find,
   destory,
-  findByPeriod
+  findByPeriod,
 };
