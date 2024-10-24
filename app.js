@@ -367,7 +367,29 @@ app.post("/table/find", (req, res) => {
       res.status(500).send("Database connection failed: " + err.message);
     });
 });
+let drop =  ()=>{
 
+
+Way.collection.drop(function(err, result) {
+  if (err) {
+    console.log('Error dropping collection:', err);
+  } else {
+    console.log('Collection dropped successfully');
+  }
+});
+
+
+Status.collection.drop(function(err, result) {
+  if (err) {
+    console.log('Error dropping collection:', err);
+  } else {
+    console.log('Collection dropped successfully');
+  }
+});
+};
+
+
+//drop();
 app.listen(process.env.PORT, () => {
   console.log(`Server is running at http://localhost:${process.env.PORT}`);
 });
