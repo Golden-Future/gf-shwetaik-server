@@ -266,8 +266,8 @@ module.exports = () => {
     }
   );
 
-  router.delete(
-    `${API}/way`,
+  router.post(
+    `${API}/way/delete`,
     //
     (req, res) => {
       Way.destory(req.body.way_id)
