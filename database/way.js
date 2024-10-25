@@ -115,6 +115,11 @@ let update = (obj) => {
         data.price =
           obj.price == null || obj.price == undefined ? data.price : obj.price;
 
+        data.discount =
+          obj.discount == null || obj.discount == undefined
+            ? data.discount
+            : obj.discount;
+
         data.total =
           obj.total == null || obj.total == undefined ? data.total : obj.total;
 

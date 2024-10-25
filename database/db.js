@@ -209,6 +209,7 @@ let wayScheme = new Schema({
   type: { type: Boolean },
   price: { type: Number },
   car_no: { type: String },
+  discount: { type: Number },
   total: { type: Number },
   status_id: { type: Number },
   since: { type: Date },
