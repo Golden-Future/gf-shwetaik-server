@@ -168,6 +168,15 @@ let findByPeriod = (fromDate, toDate) => {
   });
 };
 
+let id = (id) => {
+  return new Promise((resolve, reject) => {
+    Way.find({ car_id: id }, (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
+  });
+};
+
 let destory = (id) => {
   return new Promise((resolve, reject) => {
     Way.deleteOne({ way_id: id }, (err, data) => {
@@ -184,4 +193,5 @@ module.exports = {
   find,
   destory,
   findByPeriod,
+  id,
 };

@@ -267,6 +267,15 @@ module.exports = () => {
   );
 
   router.post(
+    `${API}/way/find/Car`,
+    //
+    (req, res) => {
+      Way.id(req.body.car_id)
+        .then((result) => res.json(response(result, true)))
+        .catch((error) => res.json(response(error, false)));
+    }
+  );
+  router.post(
     `${API}/way/delete`,
     //
     (req, res) => {

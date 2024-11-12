@@ -245,6 +245,10 @@ let Way = mongoose.model("Ways", wayScheme);
 
 // Car Rental
 
+// Booking
+
+// Booking
+
 TransferScheme.plugin(autoI, { field: "Transfer_id" });
 TransferScheme.plugin(paginate);
 let Transfers = mongoose.model("Transfers", TransferScheme);
