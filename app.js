@@ -348,9 +348,9 @@ app.post("/table/find", (req, res) => {
   pool
     .acquire()
     .then((db) => {
-      const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
+      const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} LIKE ?`;
 
-      db.query(query, [data], (err, result) => {
+      db.query(query, [`%${data}%`], (err, result) => {
         pool.release(db); // Return connection to the pool
 
         if (err) {
