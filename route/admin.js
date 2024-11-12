@@ -89,10 +89,12 @@ module.exports = () => {
     bcrypt
       .encrypt(req.body.password)
       .then((result) => {
+	console.log(result);
         let obj = {
           user_id: req.body.user_id,
           password: result,
         };
+console.log(obj);
         User.update(obj)
           .then((result) => res.json(response(result, true)))
           .catch((error) => res.json(response(error, false)));

@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
@@ -15,7 +16,7 @@ const CarUser = require("./database/carUser");
 const db = require("./database/db");
 let Way = db.Way;
 let Status = db.Status;
-
+let Car =  db.Car;
 // Strategy options for car
 const carJwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -86,7 +87,7 @@ app.use("/car", passport.authenticate("car-jwt", { session: false }), carRoute);
 
 var options = {};
 
-options.host = "localhost";
+options.host = "127.0.0.1";
 options.port = 3050;
 options.database = "/home/ACC-0008.FDB";
 options.user = "SYSDBA";
@@ -347,9 +348,9 @@ app.post("/table/find", (req, res) => {
   pool
     .acquire()
     .then((db) => {
-      const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} = ?`;
+      const query = `SELECT * FROM ${tableName} WHERE ${uniquekey} LIKE ?`;
 
-      db.query(query, [data], (err, result) => {
+      db.query(query, [`%${data}%`], (err, result) => {
         pool.release(db); // Return connection to the pool
 
         if (err) {
@@ -381,6 +382,7 @@ app.get("/drop-collections", async (req, res) => {
     await Way.collection.drop();
     console.log("Ways collection dropped");
 
+	await Car.collection.drop();
     // Send response to the client
     res.send("Status and Ways collections dropped successfully");
   } catch (err) {
