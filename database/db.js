@@ -27,6 +27,7 @@ let UserScheme = new Schema({
 let carUserScheme = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String },
+  type: { type: String },
   since: { type: Date },
 });
 
@@ -215,6 +216,57 @@ let wayScheme = new Schema({
   since: { type: Date },
 });
 
+// HOTEL
+
+// table
+let htableScheme = new Schema({
+  tableNo: { type: Number },
+});
+
+// order
+let orderScheme = new Schema({
+  htable_id: { type: Number },
+  description: { type: String },
+  status: { type: Boolean },
+  since: { type: Date },
+});
+
+// orderlist
+let orderListScheme = new Schema({
+  food_id: { type: Number },
+  order_id: { type: Number },
+  qty: { type: Number },
+});
+
+// food
+let foodScheme = new Schema({
+  name: { type: String },
+  description: { type: String },
+  prop: { type: String },
+  photo: { type: String },
+  price: { type: Number },
+  status: { type: Boolean },
+  since: { type: Date },
+});
+
+// HOTEL
+
+htableScheme.plugin(autoI, { field: "htable_id" });
+htableScheme.plugin(paginate);
+let htable = mongoose.model("htable", htableScheme);
+
+orderScheme.plugin(autoI, { field: "order_id" });
+orderScheme.plugin(paginate);
+let order = mongoose.model("order", orderScheme);
+
+foodScheme.plugin(autoI, { field: "food_id" });
+foodScheme.plugin(paginate);
+let food = mongoose.model("food", foodScheme);
+
+orderListScheme.plugin(autoI, { field: "orderList_id" });
+orderListScheme.plugin(paginate);
+let orderList = mongoose.model("orderList", orderListScheme);
+
 carUserScheme.plugin(autoI, { field: "carUser_id" });
 carUserScheme.plugin(paginate);
 let carUser = mongoose.model("carUser", carUserScheme);
@@ -337,4 +389,9 @@ module.exports = {
   Permission,
   RoleList,
   carUser,
+
+  food,
+  order,
+  orderList,
+  htable,
 };

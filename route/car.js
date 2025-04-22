@@ -1,8 +1,6 @@
 module.exports = () => {
   let express = require("express"),
     router = express.Router(),
-    jwt = require("jsonwebtoken"),
-    passport = require("passport"),
     { response } = require("../helper/e2e"),
     bcrypt = require("../helper/pass"),
     Car = require("../database/car"),
@@ -10,13 +8,15 @@ module.exports = () => {
     Status = require("../database/car_status"),
     Driver = require("../database/driver"),
     Language = require("../database/language"),
+    HTABLE = require("../database/htable"),
     CarUser = require("../database/carUser");
+
   /*** api */
   const ENV = require("../env/env").environment;
   const API = ENV.API_URL;
   /*** api */
 
-  router.post(`${API}/carUser/register`, (req, res) => {
+  router.post(`${API}/carUser/register/car`, (req, res) => {
     let { email, password } = req.body;
     bcrypt
       .encrypt(password)
@@ -24,6 +24,26 @@ module.exports = () => {
         let obj = {
           email: email,
           password: result,
+          type: "car",
+        };
+        CarUser.save(obj)
+          .then((result) => res.json(response(result, true)))
+          .catch((error) => res.json(response(error, false)));
+      })
+      .catch((error) => {
+        res.json(response(error, false));
+      });
+  });
+
+  router.post(`${API}/carUser/register/hotel`, (req, res) => {
+    let { email, password } = req.body;
+    bcrypt
+      .encrypt(password)
+      .then((result) => {
+        let obj = {
+          email: email,
+          password: result,
+          type: "hotel",
         };
         CarUser.save(obj)
           .then((result) => res.json(response(result, true)))
@@ -60,8 +80,14 @@ module.exports = () => {
       .catch((error) => res.json({ con: false, msg: "3333" }));
   });
 
-  router.get(`${API}/all/carUser/`, (req, res) => {
-    CarUser.all()
+  router.get(`${API}/all/carUser/car`, (req, res) => {
+    CarUser.all("car")
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.get(`${API}/all/carUser/hotel`, (req, res) => {
+    CarUser.all("hotel")
       .then((result) => res.json(response(result, true)))
       .catch((error) => res.json(response(error, false)));
   });
@@ -114,6 +140,48 @@ module.exports = () => {
   );
 
   // ****** CAR ******* //
+
+  // ****** HTable ******* //
+
+  router.get(`${API}/table`, (req, res) => {
+    HTABLE.all()
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post(
+    `${API}/table`,
+
+    (req, res) => {
+      HTABLE.save(req.body)
+        .then((result) => res.json(response(result, true)))
+        .catch((error) => res.json(response(error, false)));
+    }
+  );
+
+  router.post(`${API}/table/find`, (req, res) => {
+    HTABLE.find(req.body.htable_id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.put(`${API}/table`, (req, res) => {
+    HTABLE.update(req.body.htable_id)
+      .then((result) => res.json(response(result, true)))
+      .catch((error) => res.json(response(error, false)));
+  });
+
+  router.post(
+    `${API}/table/delete`,
+
+    (req, res) => {
+      HTABLE.destory(req.body.htable_id)
+        .then((result) => res.json(response(result, true)))
+        .catch((error) => res.json(response(error, false)));
+    }
+  );
+
+  // ****** HTABLE ******* //
 
   // ****** STATUS ******* //
 

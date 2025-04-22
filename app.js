@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
@@ -16,7 +15,7 @@ const CarUser = require("./database/carUser");
 const db = require("./database/db");
 let Way = db.Way;
 let Status = db.Status;
-let Car =  db.Car;
+let Car = db.Car;
 // Strategy options for car
 const carJwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -382,7 +381,7 @@ app.get("/drop-collections", async (req, res) => {
     await Way.collection.drop();
     console.log("Ways collection dropped");
 
-	await Car.collection.drop();
+    await Car.collection.drop();
     // Send response to the client
     res.send("Status and Ways collections dropped successfully");
   } catch (err) {
@@ -391,6 +390,6 @@ app.get("/drop-collections", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, "0.0.0.0", () => {
   console.log(`Server is running at http://localhost:${process.env.PORT}`);
 });
